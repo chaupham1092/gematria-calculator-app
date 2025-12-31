@@ -25,15 +25,15 @@ export default function WebCalculator() {
   useEffect(() => {
     const ciphersObj = getAvailableCiphers();
     const cats = getCipherCategories();
-    
+
     // Convert ciphers object to array for easier iteration
     const ciphersArray = Object.keys(ciphersObj).map(key => ({
       key: key,
       ...ciphersObj[key]
     }));
-    
+
     setAllCiphers(ciphersArray);
-    
+
     // Convert categories object to proper format
     const categoriesFormatted = {};
     Object.keys(cats).forEach(category => {
@@ -46,9 +46,9 @@ export default function WebCalculator() {
         };
       });
     });
-    
+
     setCategories(categoriesFormatted);
-    
+
     // Initialize selected ciphers - only select default 4 ciphers
     const defaultCiphers = [
       'English Ordinal',
@@ -56,7 +56,7 @@ export default function WebCalculator() {
       'Reverse Ordinal',
       'Reverse Full Reduction'
     ];
-    
+
     const initial = {};
     ciphersArray.forEach(cipher => {
       initial[cipher.name] = defaultCiphers.includes(cipher.name);
@@ -77,14 +77,14 @@ export default function WebCalculator() {
       const urlParams = new URLSearchParams(window.location.search);
       const calcParam = urlParams.get('calc');
       const collectionParam = urlParams.get('collection');
-      
+
       console.log('Checking URL params:', { calcParam, collectionParam });
-      
+
       if (calcParam) {
         const decoded = decodeCalculation(calcParam);
         if (decoded && decoded.text) {
           setInputText(decoded.text);
-          
+
           // Update selected ciphers if provided
           if (decoded.ciphers && decoded.ciphers.length > 0) {
             const newSelection = {};
@@ -96,38 +96,38 @@ export default function WebCalculator() {
         }
       } else if (collectionParam) {
         console.log('Processing collection parameter...');
-        
+
         // Handle shared collection - import and show research page
         const entries = decodeSharedCollection(collectionParam);
         console.log('Decoded entries:', entries);
-        
+
         if (entries && entries.length > 0) {
           // Import all entries into localStorage
           const { saveToResearch } = require('../utils/researchStorage');
-          
+
           entries.forEach(entry => {
             console.log('Processing entry:', entry);
-            
+
             // Build cipher selection object
             const cipherSelection = {};
             allCiphers.forEach(cipher => {
               cipherSelection[cipher.name] = entry.ciphers && entry.ciphers.includes(cipher.name);
             });
-            
+
             console.log('Cipher selection:', cipherSelection);
-            
+
             // Calculate results for this entry using the same logic as the main calculator
             const results = calculateGematria(entry.text, cipherSelection);
             console.log('Calculated results:', results);
-            
+
             // Save to research collection with calculated results
             saveToResearch(entry.text, cipherSelection, results, entry.note || '', entry.tags || []);
           });
-          
+
           console.log('Navigating to research page...');
           // Navigate to research page
           setCurrentPage('research');
-          
+
           // Clear URL parameters
           window.history.replaceState({}, document.title, window.location.pathname);
         }
@@ -148,13 +148,13 @@ export default function WebCalculator() {
       alert('Please enter some text to save');
       return;
     }
-    
+
     // Make sure we have results calculated
     if (results.length === 0) {
       alert('Please wait for calculations to complete');
       return;
     }
-    
+
     try {
       console.log('Saving to research:', {
         text: inputText,
@@ -162,7 +162,7 @@ export default function WebCalculator() {
         resultsCount: results.length,
         sampleResult: results[0]
       });
-      
+
       await saveToResearch(inputText, selectedCiphers, results, '', []);
       alert('Saved to Research List!');
     } catch (error) {
@@ -223,7 +223,7 @@ export default function WebCalculator() {
   }, {});
 
   // Filter results by target number if specified
-  const filteredResults = targetNumber.trim() 
+  const filteredResults = targetNumber.trim()
     ? results.filter(result => result.totalValue.toString() === targetNumber.trim())
     : results;
 
@@ -238,11 +238,11 @@ export default function WebCalculator() {
   }, {});
 
   const openPrivacyPolicy = () => {
-    Linking.openURL('https://www.privacypolicies.com/live/e92dcb74-10a4-4ac8-9983-80caf5d96b32');
+    Linking.openURL('https://gematriacalculator.xyz/pages/privacy.html');
   };
 
   const openTerms = () => {
-    Linking.openURL('https://www.privacypolicies.com/live/37ea9a23-b763-496d-a552-702e87742679');
+    Linking.openURL('https://gematriacalculator.xyz/pages/terms.html');
   };
 
   // Render different pages based on currentPage state
@@ -276,7 +276,7 @@ export default function WebCalculator() {
         {/* Left Sidebar - Filter Ciphers */}
         <View style={styles.leftSidebar}>
           <Text style={styles.sidebarTitle}>Filter Ciphers</Text>
-          
+
           <TextInput
             style={styles.searchInput}
             placeholder="Search ciphers..."
@@ -305,7 +305,7 @@ export default function WebCalculator() {
                     {collapsedCategories[category] ? '▶' : '▼'}
                   </Text>
                 </TouchableOpacity>
-                
+
                 {!collapsedCategories[category] && filteredCiphers[category].map(cipher => (
                   <TouchableOpacity
                     key={cipher.name}
@@ -338,13 +338,13 @@ export default function WebCalculator() {
               onChangeText={setInputText}
               multiline
             />
-            <TouchableOpacity 
-              style={styles.saveToResearchButton} 
+            <TouchableOpacity
+              style={styles.saveToResearchButton}
               onPress={handleSaveToResearch}
             >
               <Text style={styles.saveToResearchButtonText}>💾 Save to Research List</Text>
             </TouchableOpacity>
-            
+
             <View style={styles.filterSection}>
               <Text style={styles.filterLabel}>Filter by Number (optional):</Text>
               <TextInput
@@ -376,11 +376,11 @@ export default function WebCalculator() {
                       <Text style={styles.resultCategory}>{result.category}</Text>
                       <Text style={styles.resultValue}>{result.totalValue}</Text>
                     </View>
-                    
+
                     {result.description && (
                       <Text style={styles.cipherDescription}>{result.description}</Text>
                     )}
-                    
+
                     <View style={styles.wordBreakdown}>
                       <Text style={styles.wordBreakdownTitle}>Word Breakdown:</Text>
                       {result.wordValues && result.wordValues.map((wordObj, wordIndex) => (
@@ -422,7 +422,7 @@ export default function WebCalculator() {
                       {collapsedCategories[`summary-${category}`] ? '▶' : '▼'}
                     </Text>
                   </TouchableOpacity>
-                  
+
                   {!collapsedCategories[`summary-${category}`] && groupedResults[category].map((result, index) => (
                     <View key={index} style={styles.summaryItem}>
                       <Text style={styles.summaryName}>{result.name}</Text>
@@ -444,33 +444,33 @@ export default function WebCalculator() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Gematria Calculator</Text>
         <View style={styles.nav}>
-          <TouchableOpacity onPress={() => { 
-            setCurrentPage('home'); 
-            setShowResearch(false); 
+          <TouchableOpacity onPress={() => {
+            setCurrentPage('home');
+            setShowResearch(false);
           }}>
             <Text style={[styles.navLink, currentPage === 'home' && styles.navLinkActive]}>Home</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => { 
-            setCurrentPage('research'); 
-            setShowResearch(false); 
+          <TouchableOpacity onPress={() => {
+            setCurrentPage('research');
+            setShowResearch(false);
           }}>
             <Text style={[styles.navLink, currentPage === 'research' && styles.navLinkActive]}>Research List</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => { 
-            setCurrentPage('about'); 
-            setShowResearch(false); 
+          <TouchableOpacity onPress={() => {
+            setCurrentPage('about');
+            setShowResearch(false);
           }}>
             <Text style={[styles.navLink, currentPage === 'about' && styles.navLinkActive]}>About</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => { 
-            setCurrentPage('contact'); 
-            setShowResearch(false); 
+          <TouchableOpacity onPress={() => {
+            setCurrentPage('contact');
+            setShowResearch(false);
           }}>
             <Text style={[styles.navLink, currentPage === 'contact' && styles.navLinkActive]}>Contact</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => { 
-            setCurrentPage('download'); 
-            setShowResearch(false); 
+          <TouchableOpacity onPress={() => {
+            setCurrentPage('download');
+            setShowResearch(false);
           }}>
             <Text style={[styles.navLink, currentPage === 'download' && styles.navLinkActive]}>Download</Text>
           </TouchableOpacity>

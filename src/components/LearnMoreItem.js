@@ -3,14 +3,18 @@ import { View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, layout } from '../utils/theme';
 
-const LearnMoreItem = ({ title, url }) => {
+const LearnMoreItem = ({ title, url, onPress }) => {
   const handlePress = () => {
-    Linking.openURL(url);
+    if (onPress) {
+      onPress();
+    } else if (url) {
+      Linking.openURL(url);
+    }
   };
 
   return (
-    <TouchableOpacity 
-      style={styles.container} 
+    <TouchableOpacity
+      style={styles.container}
       onPress={handlePress}
       activeOpacity={0.7}
     >

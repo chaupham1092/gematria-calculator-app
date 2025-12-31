@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -13,8 +13,10 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, layout } from '../utils/theme';
 import LearnMoreItem from '../components/LearnMoreItem';
+import PrivacyPolicyModal from '../components/PrivacyPolicyModal';
 
 const AboutScreen = () => {
+  const [privacyModalVisible, setPrivacyModalVisible] = useState(false);
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -132,10 +134,18 @@ const AboutScreen = () => {
                 title="Gematria Blog"
                 url="https://gematriacalculator.xyz/pages/blog"
               />
+              <LearnMoreItem
+                title="Privacy Policy"
+                onPress={() => setPrivacyModalVisible(true)}
+              />
             </View>
           </View>
         </ScrollView>
       </TouchableWithoutFeedback>
+      <PrivacyPolicyModal
+        visible={privacyModalVisible}
+        onClose={() => setPrivacyModalVisible(false)}
+      />
     </KeyboardAvoidingView>
   );
 };
