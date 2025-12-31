@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Reverse Ordinal</title>
+    <script src="Web Calculator - With User Requests/ciphers.js"></script>
+</head>
+<body>
+    <h1>Debug Reverse Ordinal Calculation</h1>
+    <div id="results"></div>
+    
+    <script>
+        // Initialize the cipher system
+        Gem_Launch();
+        
+        // Find Reverse Ordinal cipher
+        let reverseOrdinalCipher = null;
+        for (let i = 0; i < allCiphers.length; i++) {
+            if (allCiphers[i].Nickname === "Reverse Ordinal") {
+                reverseOrdinalCipher = allCiphers[i];
+                break;
+            }
+        }
+        
+        let html = "<h2>Reverse Ordinal Individual Letter Values:</h2>";
+        
+        if (reverseOrdinalCipher) {
+            // Test each letter
+            const alphabet = "abcdefghijklmnopqrstuvwxyz";
+            html += "<table border='1'><tr><th>Letter</th><th>Value</th></tr>";
+            
+            for (let i = 0; i < alphabet.length; i++) {
+                const letter = alphabet[i];
+                const value = reverseOrdinalCipher.Gematria(letter, 1);
+                html += `<tr><td>${letter}</td><td>${value}</td></tr>`;
+            }
+            html += "</table>";
+            
+            // Test the word "test"
+            html += "<h2>Word 'test' breakdown:</h2>";
+            const testWord = "test";
+            let total = 0;
+            html += "<ul>";
+            for (let i = 0; i < testWord.length; i++) {
+                const letter = testWord[i];
+                const value = reverseOrdinalCipher.Gematria(letter, 1);
+                total += value;
+                html += `<li>${letter} = ${value}</li>`;
+            }
+            html += `</ul><p><strong>Total: ${total}</strong></p>`;
+
+            // Also test the full word at once
+            const fullWordValue = reverseOrdinalCipher.Gematria(testWord, 1);
+            html += `<p>Full word calculation: ${fullWordValue}</p>`;
+
+            // Test Reverse Full Reduction too
+            let reverseFullReductionCipher = null;
+            for (let i = 0; i < allCiphers.length; i++) {
+                if (allCiphers[i].Nickname === "Reverse Full Reduction") {
+                    reverseFullReductionCipher = allCiphers[i];
+                    break;
+                }
+            }
+
+            if (reverseFullReductionCipher) {
+                html += "<h2>Reverse Full Reduction 'test' breakdown:</h2>";
+                let total2 = 0;
+                html += "<ul>";
+                for (let i = 0; i < testWord.length; i++) {
+                    const letter = testWord[i];
+                    const value = reverseFullReductionCipher.Gematria(letter, 1);
+                    total2 += value;
+                    html += `<li>${letter} = ${value}</li>`;
+                }
+                html += `</ul><p><strong>Total: ${total2}</strong></p>`;
+
+                const fullWordValue2 = reverseFullReductionCipher.Gematria(testWord, 1);
+                html += `<p>Full word calculation: ${fullWordValue2}</p>`;
+            }
+        } else {
+            html += "<p>Reverse Ordinal cipher not found!</p>";
+        }
+        
+        document.getElementById('results').innerHTML = html;
+    </script>
+</body>
+</html>

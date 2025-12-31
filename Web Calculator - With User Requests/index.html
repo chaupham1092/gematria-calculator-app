@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gematria Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="title-section">
+                    <div class="app-icon">✝</div>
+                    <div class="title-text">
+                        <h1>Gematria Calculator</h1>
+                        <p>Enter text to calculate its gematria value across multiple ciphers</p>
+                    </div>
+                </div>
+                <div class="header-controls">
+                    <div class="theme-controls">
+                        <label for="theme-select">Theme:</label>
+                        <select id="theme-select">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="blue">Blue</option>
+                            <option value="green">Green</option>
+                            <option value="purple">Purple</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <div class="font-controls">
+                        <label for="font-family">Font:</label>
+                        <select id="font-family">
+                            <option value="system">System Default</option>
+                            <option value="serif">Serif</option>
+                            <option value="monospace">Monospace</option>
+                            <option value="arial">Arial</option>
+                            <option value="times">Times New Roman</option>
+                        </select>
+                        <label for="font-size">Size:</label>
+                        <input type="range" id="font-size" min="12" max="24" value="16">
+                        <span id="font-size-display">16px</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <aside class="sidebar left-sidebar">
+                <!-- Replace the current filter-section div with this: -->
+<div class="filter-section">
+    <h3>Filter Ciphers</h3>
+    <div class="search-box">
+        <input type="text" id="cipher-search" placeholder="Search ciphers...">
+    </div>
+    <div class="filter-actions">
+        <button id="select-all-btn">Select All</button>
+        <button id="clear-all-btn">Clear All</button>
+        <button id="manage-ciphers-btn">Manage Systems</button>
+    </div>
+    <div class="cipher-filters" id="cipher-filters">
+        <!-- Cipher checkboxes will be added here dynamically -->
+    </div>
+</div>
+            </aside>
+            
+            <main>
+                <div class="input-section">
+                    <div class="input-controls">
+                        <div class="text-controls">
+                            <button id="undo-btn" title="Undo">↶</button>
+                            <button id="redo-btn" title="Redo">↷</button>
+                            <button id="save-word-btn" title="Save Current Word">💾</button>
+                            <button id="saved-words-btn" title="View Saved Words">📋</button>
+                        </div>
+                        <div class="target-controls">
+                            <label for="target-number">Target Number:</label>
+                            <input type="number" id="target-number" placeholder="Enter target...">
+                            <button id="clear-target-btn">Clear</button>
+                        </div>
+                    </div>
+                    <textarea id="input-text" placeholder="Enter text here..."></textarea>
+                    <button id="calculate-btn" class="hidden">Calculate</button>
+                </div>
+                
+                <div class="results-section">
+                    <div class="results-header">
+                        <h2>Results</h2>
+                        <div class="view-controls">
+                            <button id="toggle-view-btn">Compact View</button>
+                            <button id="comparison-btn">Side-by-Side</button>
+                        </div>
+                    </div>
+                    <div id="target-matches" class="target-matches hidden">
+                        <h3>Target Matches Found:</h3>
+                        <div id="target-matches-list"></div>
+                    </div>
+                    <div id="results-container" class="results-grid">
+                        <!-- Results will be displayed here -->
+                        <p class="empty-result">Enter text to see results</p>
+                    </div>
+                    <div id="comparison-container" class="comparison-view hidden">
+                        <div class="comparison-side" id="comparison-left">
+                            <h3>Text 1</h3>
+                            <textarea id="comparison-text-1" placeholder="Enter first text..."></textarea>
+                            <div id="comparison-results-1"></div>
+                        </div>
+                        <div class="comparison-side" id="comparison-right">
+                            <h3>Text 2</h3>
+                            <textarea id="comparison-text-2" placeholder="Enter second text..."></textarea>
+                            <div id="comparison-results-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            
+            <aside class="sidebar right-sidebar">
+                <div class="summary-section">
+                    <h3>Summary</h3>
+                    <div id="summary-container">
+                        <!-- Summary will be displayed here -->
+                        <p class="empty-result">Enter text to see summary</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+        
+        <footer>
+            <p>Gematria Calculator &copy; 2025</p>
+        </footer>
+    </div>
+
+    <!-- Saved Words Modal -->
+    <div id="saved-words-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Saved Words</h3>
+                <button class="close-btn" id="close-saved-words">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="saved-words-list"></div>
+                <div class="modal-actions">
+                    <button id="clear-saved-words">Clear All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Theme Modal -->
+    <div id="custom-theme-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Custom Theme</h3>
+                <button class="close-btn" id="close-custom-theme">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="color-picker-group">
+                    <label for="bg-color">Background Color:</label>
+                    <input type="color" id="bg-color" value="#ffffff">
+                </div>
+                <div class="color-picker-group">
+                    <label for="text-color">Text Color:</label>
+                    <input type="color" id="text-color" value="#333333">
+                </div>
+                <div class="color-picker-group">
+                    <label for="accent-color">Accent Color:</label>
+                    <input type="color" id="accent-color" value="#3498db">
+                </div>
+                <div class="color-picker-group">
+                    <label for="highlight-color">Highlight Color:</label>
+                    <input type="color" id="highlight-color" value="#e74c3c">
+                </div>
+                <div class="modal-actions">
+                    <button id="apply-custom-theme">Apply Theme</button>
+                    <button id="reset-custom-theme">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cipher Management Modal -->
+    <div id="cipher-management-modal" class="modal hidden">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3>Manage Gematria Systems</h3>
+                <button class="close-btn" id="close-cipher-management">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="cipher-management-tabs">
+                    <button class="tab-btn active" data-tab="rename">Rename Systems</button>
+                    <button class="tab-btn" data-tab="create">Create Custom</button>
+                </div>
+
+                <div id="rename-tab" class="tab-content active">
+                    <h4>Rename Existing Systems</h4>
+                    <p>Click on any system name to rename it. Changes are saved automatically.</p>
+                    <div id="rename-systems-list"></div>
+                </div>
+
+                <div id="create-tab" class="tab-content hidden">
+                    <h4>Create Custom System</h4>
+                    <div class="form-group">
+                        <label for="custom-system-name">System Name:</label>
+                        <input type="text" id="custom-system-name" placeholder="Enter system name...">
+                    </div>
+                    <div class="form-group">
+                        <label for="custom-system-type">Base Type:</label>
+                        <select id="custom-system-type">
+                            <option value="ordinal">Ordinal (A=1, B=2, etc.)</option>
+                            <option value="reverse">Reverse Ordinal (A=26, B=25, etc.)</option>
+                            <option value="reduction">Reduction (A=1, B=2...I=9, J=1, etc.)</option>
+                            <option value="custom">Custom Values</option>
+                        </select>
+                    </div>
+                    <div id="custom-values-section" class="form-group hidden">
+                        <label>Custom Letter Values (A-Z):</label>
+                        <div class="custom-values-grid" id="custom-values-grid">
+                            <!-- Will be populated dynamically -->
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button id="create-custom-system">Create System</button>
+                        <button id="reset-custom-form">Reset Form</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="ciphers.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

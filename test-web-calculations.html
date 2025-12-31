@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Web Calculations</title>
+    <script src="Web Calculator - With User Requests/ciphers.js"></script>
+</head>
+<body>
+    <h1>Web Version Calculation Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        // Initialize the cipher system
+        Gem_Launch();
+        
+        const testWord = "this is a test";
+        const results = {};
+        
+        // Test specific ciphers
+        const ciphersToTest = [
+            "English Ordinal",
+            "Full Reduction", 
+            "Single Reduction",
+            "Full Reduction KV",
+            "Single Reduction KV",
+            "Extended English",
+            "Jewish",
+            "Jewish Reduction", 
+            "Jewish Ordinal",
+            "Reverse Ordinal",
+            "Reverse Full Reduction",
+            "Elizabethan 360",
+            "William G. Gray",
+            "Synx",
+            "Beatus of Liebana",
+            "Prime Qabalah",
+            "False Kabbalah"
+        ];
+        
+        // Calculate values for each cipher
+        for (let i = 0; i < allCiphers.length; i++) {
+            const cipher = allCiphers[i];
+            if (ciphersToTest.includes(cipher.Nickname)) {
+                const value = cipher.Gematria(testWord, 1);
+                results[cipher.Nickname] = value;
+
+                // For debugging, show individual letter values for problematic ciphers
+                if (cipher.Nickname === "Reverse Ordinal" || cipher.Nickname === "Reverse Full Reduction") {
+                    let breakdown = "";
+                    for (let j = 0; j < testWord.length; j++) {
+                        const char = testWord[j];
+                        const charValue = cipher.Gematria(char, 1);
+                        breakdown += char + "=" + charValue + " ";
+                    }
+                    results[cipher.Nickname + " breakdown"] = breakdown.trim();
+                }
+            }
+        }
+        
+        // Display results
+        let html = `<h2>Results for "${testWord}":</h2><ul>`;
+        for (const [name, value] of Object.entries(results)) {
+            html += `<li>${name}: ${value}</li>`;
+        }
+        html += '</ul>';
+        
+        // Also generate JavaScript object for easy copying
+        html += '<h2>JavaScript Object:</h2><pre>';
+        html += JSON.stringify(results, null, 2);
+        html += '</pre>';
+        
+        document.getElementById('results').innerHTML = html;
+        
+        // Log to console as well
+        console.log('Web version results:', results);
+    </script>
+</body>
+</html>

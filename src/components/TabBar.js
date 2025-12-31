@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing } from '../utils/theme';
 
@@ -72,8 +72,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderTopWidth: 1,
     borderTopColor: colors.lightBorder,
-    height: 80,
-    paddingBottom: spacing.xs,
+    height: Platform.OS === 'ios' ? 80 : 60,
+    paddingBottom: Platform.OS === 'ios' ? spacing.xs : 0,
+    ...Platform.select({
+      android: {
+        elevation: 8,
+      }
+    })
   },
   tabButton: {
     flex: 1,

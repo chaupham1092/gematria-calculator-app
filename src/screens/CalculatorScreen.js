@@ -77,7 +77,8 @@ const CalculatorScreen = ({ selectedCiphers }) => {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <SafeAreaView style={styles.safeArea}>
@@ -151,13 +152,29 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: layout.borderRadius.medium,
     marginBottom: spacing.md,
-    ...layout.shadow.small,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 2,
+      }
+    }),
   },
   input: {
     padding: spacing.md,
     fontSize: typography.fontSize.medium,
     minHeight: 100,
     textAlignVertical: 'top',
+    ...Platform.select({
+      android: {
+        paddingTop: spacing.md,
+        paddingBottom: spacing.md
+      }
+    })
   },
   resultsContainer: {
     flex: 1,

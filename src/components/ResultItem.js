@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { colors, typography, spacing, layout } from '../utils/theme';
 
 const ResultItem = ({ result, expanded, onToggleExpand }) => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity 
-        style={styles.header} 
+      <TouchableOpacity
+        style={styles.header}
         onPress={onToggleExpand}
         activeOpacity={0.7}
       >
@@ -16,13 +16,13 @@ const ResultItem = ({ result, expanded, onToggleExpand }) => {
           <Text style={styles.arrow}>{expanded ? '▲' : '▼'}</Text>
         </View>
       </TouchableOpacity>
-      
+
       {expanded && (
         <View style={styles.details}>
           {result.description && (
             <Text style={styles.description}>{result.description}</Text>
           )}
-          
+
           <Text style={styles.breakdownTitle}>Word Breakdown:</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.wordList}>
@@ -50,7 +50,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: layout.borderRadius.medium,
     marginBottom: spacing.md,
-    ...layout.shadow.small,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 2,
+      }
+    }),
     overflow: 'hidden',
   },
   header: {
@@ -58,7 +68,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: spacing.md,
-    borderBottomWidth: expanded => expanded ? 1 : 0,
+    borderBottomWidth: 1,
     borderBottomColor: colors.lightBorder,
   },
   name: {
@@ -104,7 +114,17 @@ const styles = StyleSheet.create({
     padding: spacing.sm,
     borderRadius: layout.borderRadius.small,
     minWidth: 120,
-    ...layout.shadow.small,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 1,
+      },
+      android: {
+        elevation: 1,
+      }
+    }),
   },
   wordHeader: {
     flexDirection: 'row',

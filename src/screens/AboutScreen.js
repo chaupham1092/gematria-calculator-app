@@ -124,6 +124,14 @@ const AboutScreen = () => {
                 title="Encyclopedia Britannica: Gematria"
                 url="https://www.britannica.com/topic/gematria"
               />
+              <LearnMoreItem
+                title="About this Calculator"
+                url="https://gematriacalculator.xyz/pages/about"
+              />
+              <LearnMoreItem
+                title="Gematria Blog"
+                url="https://gematriacalculator.xyz/pages/blog"
+              />
             </View>
           </View>
         </ScrollView>

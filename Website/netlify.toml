@@ -1,0 +1,8 @@
+[build]
+  functions = "netlify/functions"
+  publish = "/"  # Change to your build folder if needed (default is 'build')
+
+[[redirects]]
+  from = "/contact"
+  to = "/contact.html"
+  status = 200

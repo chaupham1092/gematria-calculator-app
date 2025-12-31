@@ -1,77 +1,123 @@
-# Welcome to your Expo app 👋
+# Gematria Calculator
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A comprehensive Gematria calculator available as both a mobile app (iOS/Android) and web application. Calculate numerical values of words and phrases using 25+ traditional and modern cipher systems.
 
-## Get started
+## 🌟 Features
 
-0. In package.json, make sure the "main" is "main": "./App.js",
+- **25+ Cipher Systems**: English, Hebrew, Reverse, Kabbalah, Mathematical, and more
+- **Real-time Calculations**: See results as you type
+- **Word Breakdown**: Detailed letter-by-letter value breakdown
+- **Multi-platform**: iOS app, Android app (coming soon), and web version
+- **Share Calculations**: Generate shareable links to your calculations
+- **Responsive Design**: Optimized for both mobile and desktop
 
-  "name": "gematria-calculator-app",
-  "main": "./App.js",
-  "version": "1.0.0",
+## 🚀 Live Demo
 
-0. Also in the App.js, the export default function App() need to changed to be 
+- **Web App**: [https://gematriacalculator.xyz](https://gematriacalculator.xyz)
+- **iOS App**: [Download on App Store](https://apps.apple.com/us/app/gematria-calculator-decode/id6744337544)
+- **Android App**: Coming soon
 
-function App() {
-  return (
-    <SafeAreaProvider>
-      <StatusBar style="auto" />
-      <AppNavigator />
-    </SafeAreaProvider>
-  );
-}
+## 📱 Mobile App
 
-and add the below to the end
+Built with React Native and Expo.
 
-// Register the app component as the main component
-registerRootComponent(App);
-
-export default App;
-
-This prevent Expo to open the default template instead of your app
-
-
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### Development
 
 ```bash
-npm run reset-project
+# Install dependencies
+npm install
+
+# Start Expo development server
+npm start
+
+# Run on iOS
+npm run ios
+
+# Run on Android
+npm run android
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 🌐 Web Version
 
-## Learn more
+The web version features a 3-column layout optimized for desktop:
+- Left sidebar: Filter and select ciphers
+- Center: Input text and view results
+- Right sidebar: Summary of all calculations
 
-To learn more about developing your project with Expo, look at the following resources:
+### Local Development
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+# Start web development server
+npm run web
 
-## Join the community
+# Build for production
+npm run build:web
+```
 
-Join our community of developers creating universal apps.
+## 🔧 Tech Stack
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- **Mobile**: React Native, Expo
+- **Web**: React Native Web
+- **Deployment**: Netlify (web), Expo EAS (mobile)
+- **Forms**: Netlify Forms
+- **Styling**: React Native StyleSheet
+
+## 📦 Project Structure
+
+```
+├── app/                    # Expo Router screens (mobile)
+├── src/
+│   ├── components/        # Shared mobile components
+│   ├── data/             # Cipher definitions and data
+│   ├── navigation/       # Mobile navigation
+│   ├── screens/          # Mobile screens
+│   ├── utils/            # Utility functions
+│   └── web/              # Web-specific code
+│       ├── components/   # Web components
+│       └── pages/        # Web pages
+├── assets/               # Images and fonts
+└── netlify/             # Netlify configuration
+```
+
+## 🚢 Deployment
+
+### Web (Netlify)
+
+1. Push to GitHub
+2. Connect repository to Netlify
+3. Build command: `npm run build:web`
+4. Publish directory: `dist`
+
+See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for detailed instructions.
+
+### Mobile (Expo EAS)
+
+```bash
+# iOS
+eas build --platform ios
+eas submit --platform ios
+
+# Android
+eas build --platform android
+eas submit --platform android
+```
+
+## 📝 Documentation
+
+- [Contact Form Setup](CONTACT_FORM_SETUP.md)
+- [Deployment Guide](DEPLOYMENT_GUIDE.md)
+
+## 🤝 Contributing
+
+This is a private repository. For questions or suggestions, please use the contact form on the website.
+
+## 📄 License
+
+All rights reserved © 2025
+
+## 🔗 Links
+
+- Website: [gematriacalculator.xyz](https://gematriacalculator.xyz)
+- iOS App: [App Store](https://apps.apple.com/us/app/gematria-calculator-decode/id6744337544)
+- Privacy Policy: [Link](https://www.privacypolicies.com/live/e92dcb74-10a4-4ac8-9983-80caf5d96b32)
+- Terms of Service: [Link](https://www.privacypolicies.com/live/37ea9a23-b763-496d-a552-702e87742679)

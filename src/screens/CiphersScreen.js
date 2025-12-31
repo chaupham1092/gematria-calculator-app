@@ -4,7 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { colors, typography, spacing, layout } from '../utils/theme';
 import CipherItem from '../components/CipherItem';
 import CategoryHeader from '../components/CategoryHeader';
-import { ciphers, cipherCategories } from '../data/ciphers';
+import { getAvailableCiphers, getCipherCategories } from '../utils/calculator';
 import { Ionicons } from '@expo/vector-icons';
 
 const CiphersScreen = ({ selectedCiphers, setSelectedCiphers }) => {
@@ -12,15 +12,25 @@ const CiphersScreen = ({ selectedCiphers, setSelectedCiphers }) => {
   const [expandedCategories, setExpandedCategories] = useState({
     English: true,
     Reverse: true,
-    Jewish: true
+    Jewish: true,
+    Kabbalah: true,
+    Mathematical: true,
+    Other: true
   });
+
+  // Get ciphers and categories from web-compatible system
+  const availableCiphers = getAvailableCiphers();
+  const cipherCategories = getCipherCategories();
 
   useFocusEffect(
     useCallback(() => {
       setExpandedCategories({
         English: true,
         Reverse: true,
-        Jewish: true
+        Jewish: true,
+        Kabbalah: true,
+        Mathematical: true,
+        Other: true
       });
     }, [])
   );
@@ -33,36 +43,44 @@ const CiphersScreen = ({ selectedCiphers, setSelectedCiphers }) => {
   };
 
   const toggleCipher = (cipherKey) => {
+    const cipher = availableCiphers[cipherKey];
+    const isCurrentlySelected = selectedCiphers[cipherKey] || selectedCiphers[cipher.name];
+
     setSelectedCiphers({
       ...selectedCiphers,
-      [cipherKey]: !selectedCiphers[cipherKey]
+      [cipherKey]: !isCurrentlySelected,
+      [cipher.name]: !isCurrentlySelected
     });
   };
 
   const selectAll = () => {
     const newSelections = {};
-    Object.keys(ciphers).forEach(key => {
+    Object.keys(availableCiphers).forEach(key => {
       newSelections[key] = true;
+      // Also enable by cipher name for compatibility
+      newSelections[availableCiphers[key].name] = true;
     });
     setSelectedCiphers(newSelections);
   };
 
   const clearAll = () => {
     const newSelections = {};
-    Object.keys(ciphers).forEach(key => {
+    Object.keys(availableCiphers).forEach(key => {
       newSelections[key] = false;
+      // Also disable by cipher name for compatibility
+      newSelections[availableCiphers[key].name] = false;
     });
     setSelectedCiphers(newSelections);
   };
 
   const renderCipherItem = (cipherKey) => {
-    const cipher = ciphers[cipherKey];
+    const cipher = availableCiphers[cipherKey];
     return (
       <CipherItem
         key={cipherKey}
         name={cipher.name}
         description={cipher.description}
-        isSelected={selectedCiphers[cipherKey]}
+        isSelected={selectedCiphers[cipherKey] || selectedCiphers[cipher.name]}
         onToggle={() => toggleCipher(cipherKey)}
       />
     );
@@ -70,9 +88,11 @@ const CiphersScreen = ({ selectedCiphers, setSelectedCiphers }) => {
 
   const renderCategory = (category) => {
     const categoryKeys = cipherCategories[category];
+    if (!categoryKeys || categoryKeys.length === 0) return null;
+
     if (searchTerm) {
       const filteredKeys = categoryKeys.filter(key =>
-        ciphers[key].name.toLowerCase().includes(searchTerm.toLowerCase())
+        availableCiphers[key] && availableCiphers[key].name.toLowerCase().includes(searchTerm.toLowerCase())
       );
       if (filteredKeys.length === 0) return null;
     }
@@ -87,7 +107,8 @@ const CiphersScreen = ({ selectedCiphers, setSelectedCiphers }) => {
         {expandedCategories[category] && (
           <View style={styles.ciphersList}>
             {categoryKeys.map(key => {
-              if (searchTerm && !ciphers[key].name.toLowerCase().includes(searchTerm.toLowerCase())) {
+              if (!availableCiphers[key]) return null;
+              if (searchTerm && !availableCiphers[key].name.toLowerCase().includes(searchTerm.toLowerCase())) {
                 return null;
               }
               return renderCipherItem(key);
@@ -176,6 +197,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: spacing.md,
     fontSize: typography.fontSize.medium,
+    ...Platform.select({
+      android: {
+        paddingVertical: spacing.sm
+      }
+    })
   },
   buttonsContainer: {
     flexDirection: 'row',

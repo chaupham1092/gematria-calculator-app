@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gematria Calculator – Find Hidden Meanings & Numerology Values</title>
+    <meta name="description" content="Free online Gematria calculator with 25+ ciphers. Instantly calculate numerical values of words and phrases for numerology and hidden meanings in texts.">
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://gematriacalculator.xyz/">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <!-- Schema Markup -->
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Website",
+          "name": "Gematria Calculator",
+          "url": "https://gematriacalculator.xyz/",
+          "description": "Find the numerical value of words using multiple gematria ciphers. Explore the mystical world of numerology and hidden meanings in texts.",
+          "publisher": {
+            "@type": "Organization",
+            "name": "Gematria Calculator",
+            "url": "https://gematriacalculator.xyz/",
+            "logo": "https://gematriacalculator.xyz/favicon.png"
+          }
+        }
+    </script>
+
+    <!-- Open Graph Meta Tags (for Facebook, LinkedIn, etc.) -->
+    <meta property="og:title" content="Gematria Calculator – Discover the Hidden Meanings of Words">
+    <meta property="og:description" content="Use our Gematria Calculator to uncover the mystical and numerical meanings behind words. Supports multiple ciphers!">
+    <meta property="og:image" content="https://gematriacalculator.xyz/images/og-image.png">
+    <meta property="og:url" content="https://gematriacalculator.xyz/">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Gematria Calculator – Find Hidden Meanings in Words">
+    <meta name="twitter:description" content="Calculate gematria values across multiple ciphers and explore the hidden numerical significance of words.">
+    <meta name="twitter:image" content="https://gematriacalculator.xyz/images/twitter-image.png">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Gematria Calculator</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active">Gematria Calculator</a></li>
+                <li><a href="advance/" class="active">Advanced Calculator</a></li>
+                <li><a href="pages/about.html">About Gematria</a></li>
+                <li><a href="pages/blog.html">Blog</a></li>                
+                <li><a href="pages/contact.html">Contact</a></li>
+                <li><a href="pages/privacy.html">Privacy Policy</a></li>
+                <li><a href="pages/terms.html">Terms of Service</a></li>
+                <li><a href="download.html" class="active">Download App</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <aside class="sidebar left-sidebar">
+                <div class="filter-section">
+                    <h3>Filter Ciphers</h3>
+                    <div class="filter-search">
+                        <input type="text" id="cipher-search" placeholder="Search ciphers...">
+                    </div>
+                    <div class="filter-actions">
+                        <button id="select-all-btn">Select All</button>
+                        <button id="clear-all-btn">Clear All</button>
+                    </div>
+                    <div class="cipher-filters" id="cipher-filters">
+                        <!-- Cipher checkboxes will be added here dynamically -->
+                    </div>
+                </div>
+            </aside>
+
+            <main>
+                <div class="input-section">
+                    <textarea id="input-text" placeholder="Enter text to calculate its gematria value across multiple ciphers..."></textarea>
+                    <button id="calculate-btn" class="hidden">Calculate</button>
+                </div>
+
+                <div class="results-section">
+                    <h2>Results</h2>
+                    <div id="results-container" class="results-grid">
+                        <p class="empty-result">Enter text to see results</p>
+                    </div>
+                </div>
+            </main>
+
+            <aside class="sidebar right-sidebar">
+                <div class="summary-section">
+                    <h3>Summary</h3>
+                    <div id="summary-container">
+                        <p class="empty-result">Enter text to see summary</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>Gematria Calculator © 2025</p>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="advance/">Advanced Calculator</a>
+                <a href="pages/about.html">About</a>
+                <a href="pages/blog.html">Blog</a>
+                <a href="pages/contact.html">Contact</a>
+                <a href="pages/privacy.html">Privacy Policy</a>
+                <a href="pages/terms.html">Terms of Service</a>
+                <a href="download.html">Download App</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="ciphers.js"></script>
+    <script src="script.js"></script>
+    <script src="/gtm.js"></script>
+</body>
+</html>
