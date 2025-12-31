@@ -38,8 +38,8 @@ Metro bundler with `expo export --platform web` was looking for routes in an `ap
 **File: `netlify.toml`**
 ```toml
 [build]
-  command = "npx expo export:web"  // Simplified from "npx expo export --platform web --output-dir dist"
-  publish = "dist"
+  command = "npx expo export:web"
+  publish = "web-build"  // Changed from "dist" to match webpack output
 ```
 
 **Why:** `expo export:web` is the correct command for webpack-based web builds.
@@ -180,7 +180,7 @@ WebCalculator    AppNavigator
 2. **Local Build:**
    ```bash
    npm run build:web
-   # Verify: dist/ folder created
+   # Verify: web-build/ folder created
    # Verify: No errors in console
    ```
 
