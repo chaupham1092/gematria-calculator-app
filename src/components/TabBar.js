@@ -2,68 +2,72 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing } from '../utils/theme';
+import AdBanner from './AdBanner';
 
 const TabBar = ({ state, descriptors, navigation }) => {
   return (
-    <View style={styles.container}>
-      {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
-        const label =
-          options.tabBarLabel !== undefined
-            ? options.tabBarLabel
-            : options.title !== undefined
-            ? options.title
-            : route.name;
+    <View>
+      <AdBanner />
+      <View style={styles.container}>
+        {state.routes.map((route, index) => {
+          const { options } = descriptors[route.key];
+          const label =
+            options.tabBarLabel !== undefined
+              ? options.tabBarLabel
+              : options.title !== undefined
+                ? options.title
+                : route.name;
 
-        const isFocused = state.index === index;
+          const isFocused = state.index === index;
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            canPreventDefault: true,
-          });
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
 
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
+
+          let iconName;
+          if (route.name === 'Calculator') {
+            iconName = 'calculator-outline';
+          } else if (route.name === 'Research') {
+            iconName = 'bookmarks-outline';
+          } else if (route.name === 'Ciphers') {
+            iconName = 'list-outline';
+          } else if (route.name === 'About') {
+            iconName = 'information-circle-outline';
           }
-        };
 
-        let iconName;
-        if (route.name === 'Calculator') {
-          iconName = 'calculator-outline';
-        } else if (route.name === 'Research') {
-          iconName = 'bookmarks-outline';
-        } else if (route.name === 'Ciphers') {
-          iconName = 'list-outline';
-        } else if (route.name === 'About') {
-          iconName = 'information-circle-outline';
-        }
-
-        return (
-          <TouchableOpacity
-            key={index}
-            accessibilityRole="button"
-            accessibilityState={isFocused ? { selected: true } : {}}
-            accessibilityLabel={options.tabBarAccessibilityLabel}
-            testID={options.tabBarTestID}
-            onPress={onPress}
-            style={styles.tabButton}
-          >
-            <Ionicons
-              name={iconName}
-              size={24}
-              color={isFocused ? colors.primary : colors.lightText}
-            />
-            <Text style={[
-              styles.tabText,
-              { color: isFocused ? colors.primary : colors.lightText }
-            ]}>
-              {label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
+          return (
+            <TouchableOpacity
+              key={index}
+              accessibilityRole="button"
+              accessibilityState={isFocused ? { selected: true } : {}}
+              accessibilityLabel={options.tabBarAccessibilityLabel}
+              testID={options.tabBarTestID}
+              onPress={onPress}
+              style={styles.tabButton}
+            >
+              <Ionicons
+                name={iconName}
+                size={24}
+                color={isFocused ? colors.primary : colors.lightText}
+              />
+              <Text style={[
+                styles.tabText,
+                { color: isFocused ? colors.primary : colors.lightText }
+              ]}>
+                {label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </View>
   );
 };

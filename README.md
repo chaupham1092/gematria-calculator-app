@@ -107,6 +107,10 @@ eas submit --platform android
 - [Contact Form Setup](CONTACT_FORM_SETUP.md)
 - [Deployment Guide](DEPLOYMENT_GUIDE.md)
 
+## ⚠️ Development Guidelines
+
+- **No Unnecessary Documentation**: Do not create any new documentation files (e.g., guidelines, references, summaries) unless explicitly requested. Keep the repository clean and focus on code changes.
+
 ## 🤝 Contributing
 
 This is a private repository. For questions or suggestions, please use the contact form on the website.
