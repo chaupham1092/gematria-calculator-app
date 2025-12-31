@@ -32,6 +32,8 @@ const TabBar = ({ state, descriptors, navigation }) => {
         let iconName;
         if (route.name === 'Calculator') {
           iconName = 'calculator-outline';
+        } else if (route.name === 'Research') {
+          iconName = 'bookmarks-outline';
         } else if (route.name === 'Ciphers') {
           iconName = 'list-outline';
         } else if (route.name === 'About') {

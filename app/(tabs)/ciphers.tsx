@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import CalculatorScreen from '../../src/screens/CalculatorScreen';
+import CiphersScreen from '../../src/screens/CiphersScreen';
 import { getInitialCipherSelections } from '../../src/utils/calculator';
 
 const CIPHER_SELECTIONS_STORAGE_KEY = 'gematria_calculator_cipher_selections';
@@ -23,9 +23,8 @@ const getDefaultCipherSelections = () => {
   return selections;
 };
 
-export default function CalculatorTab() {
+export default function CiphersTab() {
   const [selectedCiphers, setSelectedCiphers] = useState(getDefaultCipherSelections());
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadSavedSelections = async () => {
@@ -37,35 +36,27 @@ export default function CalculatorTab() {
         }
       } catch (error) {
         console.error('Error loading saved cipher selections:', error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
     loadSavedSelections();
   }, []);
 
-  useEffect(() => {
-    const saveCipherSelections = async () => {
-      try {
-        await AsyncStorage.setItem(CIPHER_SELECTIONS_STORAGE_KEY, JSON.stringify(selectedCiphers));
-      } catch (error) {
-        console.error('Error saving cipher selections:', error);
-      }
-    };
-
-    if (!isLoading) {
-      saveCipherSelections();
+  const updateSelectedCiphers = async (newSelections: Record<string, boolean>) => {
+    setSelectedCiphers(newSelections);
+    try {
+      await AsyncStorage.setItem(CIPHER_SELECTIONS_STORAGE_KEY, JSON.stringify(newSelections));
+    } catch (error) {
+      console.error('Error saving cipher selections:', error);
     }
-  }, [selectedCiphers, isLoading]);
-
-  if (isLoading) {
-    return null;
-  }
+  };
 
   return (
     <SafeAreaProvider>
-      <CalculatorScreen selectedCiphers={selectedCiphers} route={{}} />
+      <CiphersScreen 
+        selectedCiphers={selectedCiphers}
+        setSelectedCiphers={updateSelectedCiphers}
+      />
     </SafeAreaProvider>
   );
 }

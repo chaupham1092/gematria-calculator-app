@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity, StyleSheet, Linking } from 'react-native';
 import { calculateGematria, getAvailableCiphers, getCipherCategories } from '../utils/calculator';
 import { decodeCalculation } from '../utils/shareUtils';
+import { decodeSharedCollection } from '../utils/researchStorage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import DownloadPage from './pages/DownloadPage';
-import ShareButton from './components/ShareButton';
+import ResearchCollection from './components/ResearchCollection';
+import { saveToResearch } from '../utils/researchStorage';
 
 export default function WebCalculator() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -16,6 +18,8 @@ export default function WebCalculator() {
   const [collapsedCategories, setCollapsedCategories] = useState({});
   const [allCiphers, setAllCiphers] = useState([]);
   const [categories, setCategories] = useState({});
+  const [showResearch, setShowResearch] = useState(false);
+  const [targetNumber, setTargetNumber] = useState('');
 
   // Initialize ciphers and categories
   useEffect(() => {
@@ -45,13 +49,126 @@ export default function WebCalculator() {
     
     setCategories(categoriesFormatted);
     
-    // Initialize selected ciphers - select all by default
+    // Initialize selected ciphers - only select default 4 ciphers
+    const defaultCiphers = [
+      'English Ordinal',
+      'Full Reduction',
+      'Reverse Ordinal',
+      'Reverse Full Reduction'
+    ];
+    
     const initial = {};
     ciphersArray.forEach(cipher => {
-      initial[cipher.name] = true;
+      initial[cipher.name] = defaultCiphers.includes(cipher.name);
     });
     setSelectedCiphers(initial);
   }, []);
+
+  // Check for shared calculation in URL - run after ciphers are loaded
+  useEffect(() => {
+    if (allCiphers.length > 0) {
+      handleSharedCalculation();
+    }
+  }, [allCiphers]);
+
+  // Handle incoming shared calculations
+  const handleSharedCalculation = () => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const calcParam = urlParams.get('calc');
+      const collectionParam = urlParams.get('collection');
+      
+      console.log('Checking URL params:', { calcParam, collectionParam });
+      
+      if (calcParam) {
+        const decoded = decodeCalculation(calcParam);
+        if (decoded && decoded.text) {
+          setInputText(decoded.text);
+          
+          // Update selected ciphers if provided
+          if (decoded.ciphers && decoded.ciphers.length > 0) {
+            const newSelection = {};
+            allCiphers.forEach(cipher => {
+              newSelection[cipher.name] = decoded.ciphers.includes(cipher.name);
+            });
+            setSelectedCiphers(newSelection);
+          }
+        }
+      } else if (collectionParam) {
+        console.log('Processing collection parameter...');
+        
+        // Handle shared collection - import and show research page
+        const entries = decodeSharedCollection(collectionParam);
+        console.log('Decoded entries:', entries);
+        
+        if (entries && entries.length > 0) {
+          // Import all entries into localStorage
+          const { saveToResearch } = require('../utils/researchStorage');
+          
+          entries.forEach(entry => {
+            console.log('Processing entry:', entry);
+            
+            // Build cipher selection object
+            const cipherSelection = {};
+            allCiphers.forEach(cipher => {
+              cipherSelection[cipher.name] = entry.ciphers && entry.ciphers.includes(cipher.name);
+            });
+            
+            console.log('Cipher selection:', cipherSelection);
+            
+            // Calculate results for this entry using the same logic as the main calculator
+            const results = calculateGematria(entry.text, cipherSelection);
+            console.log('Calculated results:', results);
+            
+            // Save to research collection with calculated results
+            saveToResearch(entry.text, cipherSelection, results, entry.note || '', entry.tags || []);
+          });
+          
+          console.log('Navigating to research page...');
+          // Navigate to research page
+          setCurrentPage('research');
+          
+          // Clear URL parameters
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading shared calculation:', error);
+    }
+  };
+
+  const handleLoadResearch = (text, ciphers) => {
+    setInputText(text);
+    setSelectedCiphers(ciphers);
+    setCurrentPage('home'); // Go back to home page
+  };
+
+  const handleSaveToResearch = async () => {
+    if (!inputText.trim()) {
+      alert('Please enter some text to save');
+      return;
+    }
+    
+    // Make sure we have results calculated
+    if (results.length === 0) {
+      alert('Please wait for calculations to complete');
+      return;
+    }
+    
+    try {
+      console.log('Saving to research:', {
+        text: inputText,
+        ciphers: selectedCiphers,
+        resultsCount: results.length,
+        sampleResult: results[0]
+      });
+      
+      await saveToResearch(inputText, selectedCiphers, results, '', []);
+      alert('Saved to Research List!');
+    } catch (error) {
+      alert(error.message);
+    }
+  };
 
   // Calculate results when input or selected ciphers change
   useEffect(() => {
@@ -105,8 +222,13 @@ export default function WebCalculator() {
     return acc;
   }, {});
 
+  // Filter results by target number if specified
+  const filteredResults = targetNumber.trim() 
+    ? results.filter(result => result.totalValue.toString() === targetNumber.trim())
+    : results;
+
   // Group results by category
-  const groupedResults = results.reduce((acc, result) => {
+  const groupedResults = filteredResults.reduce((acc, result) => {
     const category = result.category;
     if (!acc[category]) {
       acc[category] = [];
@@ -126,6 +248,17 @@ export default function WebCalculator() {
   // Render different pages based on currentPage state
   const renderPage = () => {
     switch (currentPage) {
+      case 'research':
+        return (
+          <View style={styles.fullPageContent}>
+            <ResearchCollection
+              currentText={inputText}
+              currentCiphers={selectedCiphers}
+              currentResults={results}
+              onLoadResearch={handleLoadResearch}
+            />
+          </View>
+        );
       case 'about':
         return <AboutPage />;
       case 'contact':
@@ -205,15 +338,38 @@ export default function WebCalculator() {
               onChangeText={setInputText}
               multiline
             />
+            <TouchableOpacity 
+              style={styles.saveToResearchButton} 
+              onPress={handleSaveToResearch}
+            >
+              <Text style={styles.saveToResearchButtonText}>💾 Save to Research List</Text>
+            </TouchableOpacity>
+            
+            <View style={styles.filterSection}>
+              <Text style={styles.filterLabel}>Filter by Number (optional):</Text>
+              <TextInput
+                style={styles.numberInput}
+                placeholder="e.g., 33"
+                value={targetNumber}
+                onChangeText={setTargetNumber}
+                keyboardType="numeric"
+              />
+            </View>
           </View>
 
           <Text style={styles.resultsTitle}>Results</Text>
           <ScrollView style={styles.resultsSection}>
             {results.length === 0 ? (
               <Text style={styles.emptyText}>Enter text to see results</Text>
+            ) : targetNumber.trim() && filteredResults.length === 0 ? (
+              <View style={styles.noMatchContainer}>
+                <Text style={styles.noMatchIcon}>🔍</Text>
+                <Text style={styles.noMatchText}>No ciphers match the number {targetNumber}</Text>
+                <Text style={styles.noMatchSubtext}>Try a different number or clear the filter</Text>
+              </View>
             ) : (
               <View style={styles.resultsGrid}>
-                {results.map((result, index) => (
+                {filteredResults.map((result, index) => (
                   <View key={index} style={styles.resultCard}>
                     <View style={styles.resultHeader}>
                       <Text style={styles.resultCipherName}>{result.name}</Text>
@@ -252,6 +408,8 @@ export default function WebCalculator() {
           <ScrollView style={styles.summaryList}>
             {results.length === 0 ? (
               <Text style={styles.emptyText}>Enter text to see summary</Text>
+            ) : targetNumber.trim() && filteredResults.length === 0 ? (
+              <Text style={styles.emptyText}>No matches for {targetNumber}</Text>
             ) : (
               Object.keys(groupedResults).map(category => (
                 <View key={category}>
@@ -286,16 +444,34 @@ export default function WebCalculator() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Gematria Calculator</Text>
         <View style={styles.nav}>
-          <TouchableOpacity onPress={() => setCurrentPage('home')}>
+          <TouchableOpacity onPress={() => { 
+            setCurrentPage('home'); 
+            setShowResearch(false); 
+          }}>
             <Text style={[styles.navLink, currentPage === 'home' && styles.navLinkActive]}>Home</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setCurrentPage('about')}>
+          <TouchableOpacity onPress={() => { 
+            setCurrentPage('research'); 
+            setShowResearch(false); 
+          }}>
+            <Text style={[styles.navLink, currentPage === 'research' && styles.navLinkActive]}>Research List</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => { 
+            setCurrentPage('about'); 
+            setShowResearch(false); 
+          }}>
             <Text style={[styles.navLink, currentPage === 'about' && styles.navLinkActive]}>About</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setCurrentPage('contact')}>
+          <TouchableOpacity onPress={() => { 
+            setCurrentPage('contact'); 
+            setShowResearch(false); 
+          }}>
             <Text style={[styles.navLink, currentPage === 'contact' && styles.navLinkActive]}>Contact</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setCurrentPage('download')}>
+          <TouchableOpacity onPress={() => { 
+            setCurrentPage('download'); 
+            setShowResearch(false); 
+          }}>
             <Text style={[styles.navLink, currentPage === 'download' && styles.navLinkActive]}>Download</Text>
           </TouchableOpacity>
         </View>
@@ -357,8 +533,13 @@ const styles = StyleSheet.create({
   mainContent: {
     flex: 1,
     flexDirection: 'row',
+    justifyContent: 'center',
     padding: 20,
     gap: 20,
+  },
+  fullPageContent: {
+    flex: 1,
+    padding: 20,
     maxWidth: 1400,
     alignSelf: 'center',
     width: '100%',
@@ -473,7 +654,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   centerContent: {
-    flex: 1,
+    width: 550,
     backgroundColor: 'white',
     borderRadius: 5,
     padding: 20,
@@ -494,6 +675,58 @@ const styles = StyleSheet.create({
     fontSize: 16,
     minHeight: 100,
     textAlignVertical: 'top',
+    marginBottom: 10,
+  },
+  saveToResearchButton: {
+    backgroundColor: '#3498db',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  saveToResearchButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  filterSection: {
+    marginTop: 15,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  filterLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginBottom: 8,
+  },
+  numberInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+    padding: 10,
+    fontSize: 16,
+  },
+  noMatchContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
+  noMatchIcon: {
+    fontSize: 48,
+    marginBottom: 15,
+  },
+  noMatchText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#7f8c8d',
+    marginBottom: 8,
+  },
+  noMatchSubtext: {
+    fontSize: 14,
+    color: '#95a5a6',
+    textAlign: 'center',
   },
   resultsTitle: {
     fontSize: 20,
@@ -512,13 +745,13 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   resultCard: {
-    width: 'calc(50% - 10px)',
+    width: '100%',
     backgroundColor: '#f9f9f9',
     borderRadius: 5,
     borderLeftWidth: 4,
     borderLeftColor: '#3498db',
     padding: 15,
-    marginBottom: 20,
+    marginBottom: 15,
   },
   resultHeader: {
     flexDirection: 'row',

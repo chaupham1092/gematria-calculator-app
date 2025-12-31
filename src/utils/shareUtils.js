@@ -54,17 +54,35 @@ export const generateDeepLink = (text, selectedCiphers) => {
 };
 
 /**
- * Shorten URL using is.gd API
+ * Shorten URL using Netlify function (production) or is.gd API (fallback)
  * Returns the original URL if shortening fails
  */
 export const shortenUrl = async (longUrl) => {
   try {
-    const response = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`);
-    const data = await response.json();
-    
-    if (data.shorturl) {
-      return data.shorturl;
+    // Try Netlify function first (avoids rate limiting)
+    const response = await fetch('/.netlify/functions/shorten-url', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url: longUrl }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.shortUrl) {
+        return data.shortUrl;
+      }
     }
+    
+    // Fallback to direct is.gd API call
+    const fallbackResponse = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`);
+    const fallbackData = await fallbackResponse.json();
+    
+    if (fallbackData.shorturl) {
+      return fallbackData.shorturl;
+    }
+    
     return longUrl;
   } catch (error) {
     console.error('Error shortening URL:', error);

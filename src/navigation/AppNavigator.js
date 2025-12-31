@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import CalculatorScreen from '../screens/CalculatorScreen';
 import CiphersScreen from '../screens/CiphersScreen';
+import ResearchScreen from '../screens/ResearchScreen';
 import AboutScreen from '../screens/AboutScreen';
 import TabBar from '../components/TabBar';
 import { getInitialCipherSelections } from '../utils/calculator';
@@ -13,8 +14,26 @@ const Tab = createBottomTabNavigator();
 
 const CIPHER_SELECTIONS_STORAGE_KEY = 'gematria_calculator_cipher_selections';
 
+// Default cipher selections - only 4 ciphers
+const getDefaultCipherSelections = () => {
+  const allCiphers = getInitialCipherSelections();
+  const defaultCiphers = [
+    'English Ordinal',
+    'Full Reduction',
+    'Reverse Ordinal',
+    'Reverse Full Reduction'
+  ];
+  
+  const selections = {};
+  Object.keys(allCiphers).forEach(key => {
+    selections[key] = defaultCiphers.includes(key);
+  });
+  
+  return selections;
+};
+
 const AppNavigator = () => {
-  const [selectedCiphers, setSelectedCiphers] = useState(getInitialCipherSelections());
+  const [selectedCiphers, setSelectedCiphers] = useState(getDefaultCipherSelections());
   const [isLoading, setIsLoading] = useState(true);
 
   // Load saved cipher selections from AsyncStorage
@@ -70,6 +89,15 @@ const AppNavigator = () => {
       >
         <Tab.Screen name="Calculator">
           {props => <CalculatorScreen {...props} selectedCiphers={selectedCiphers} />}
+        </Tab.Screen>
+        <Tab.Screen name="Research">
+          {props => (
+            <ResearchScreen
+              {...props}
+              selectedCiphers={selectedCiphers}
+              setSelectedCiphers={updateSelectedCiphers}
+            />
+          )}
         </Tab.Screen>
         <Tab.Screen name="Ciphers">
           {props => (
