@@ -501,67 +501,68 @@ export default function WebCalculator() {
 
   return (
     <View style={styles.container}>
-      {/* Header with Navigation */}
-      <View style={[styles.header, isMobile && styles.headerMobile]}>
-        <Text style={styles.headerTitle}>Gematria Calculator</Text>
-        <ScrollView horizontal={isMobile} showsHorizontalScrollIndicator={false}>
-          <View style={[styles.nav, isMobile && styles.navMobile]}>
-            <TouchableOpacity onPress={() => {
-              setCurrentPage('home');
-              setShowCipherFilters(false);
-              setShowSummary(false);
-            }}>
-              <Text style={[styles.navLink, currentPage === 'home' && styles.navLinkActive]}>Home</Text>
+      {/* Entire page is now scrollable, including Header and Footer */}
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        {/* Header with Navigation - Moved inside ScrollView */}
+        <View style={[styles.header, isMobile && styles.headerMobile]}>
+          <Text style={styles.headerTitle}>Gematria Calculator</Text>
+          <ScrollView horizontal={isMobile} showsHorizontalScrollIndicator={false}>
+            <View style={[styles.nav, isMobile && styles.navMobile]}>
+              <TouchableOpacity onPress={() => {
+                setCurrentPage('home');
+                setShowCipherFilters(false);
+                setShowSummary(false);
+              }}>
+                <Text style={[styles.navLink, currentPage === 'home' && styles.navLinkActive]}>Home</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => {
+                setCurrentPage('research');
+                setShowCipherFilters(false);
+                setShowSummary(false);
+              }}>
+                <Text style={[styles.navLink, currentPage === 'research' && styles.navLinkActive]}>Research</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => {
+                setCurrentPage('about');
+                setShowCipherFilters(false);
+                setShowSummary(false);
+              }}>
+                <Text style={[styles.navLink, currentPage === 'about' && styles.navLinkActive]}>About</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => {
+                setCurrentPage('contact');
+                setShowCipherFilters(false);
+                setShowSummary(false);
+              }}>
+                <Text style={[styles.navLink, currentPage === 'contact' && styles.navLinkActive]}>Contact</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => {
+                setCurrentPage('download');
+                setShowCipherFilters(false);
+                setShowSummary(false);
+              }}>
+                <Text style={[styles.navLink, currentPage === 'download' && styles.navLinkActive]}>App</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </View>
+
+        {/* Page Content */}
+        {renderPage()}
+
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Gematria Calculator © 2025</Text>
+          <View style={styles.footerLinks}>
+            <TouchableOpacity onPress={openPrivacyPolicy}>
+              <Text style={styles.footerLink}>Privacy Policy</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => {
-              setCurrentPage('research');
-              setShowCipherFilters(false);
-              setShowSummary(false);
-            }}>
-              <Text style={[styles.navLink, currentPage === 'research' && styles.navLinkActive]}>Research</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => {
-              setCurrentPage('about');
-              setShowCipherFilters(false);
-              setShowSummary(false);
-            }}>
-              <Text style={[styles.navLink, currentPage === 'about' && styles.navLinkActive]}>About</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => {
-              setCurrentPage('contact');
-              setShowCipherFilters(false);
-              setShowSummary(false);
-            }}>
-              <Text style={[styles.navLink, currentPage === 'contact' && styles.navLinkActive]}>Contact</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => {
-              setCurrentPage('download');
-              setShowCipherFilters(false);
-              setShowSummary(false);
-            }}>
-              <Text style={[styles.navLink, currentPage === 'download' && styles.navLinkActive]}>App</Text>
+            <TouchableOpacity onPress={openTerms}>
+              <Text style={styles.footerLink}>Terms & Conditions</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
-      </View>
-
-      {/* Page Content */}
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        {renderPage()}
-      </ScrollView>
-
-      {/* Footer */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Gematria Calculator © 2025</Text>
-        <View style={styles.footerLinks}>
-          <TouchableOpacity onPress={openPrivacyPolicy}>
-            <Text style={styles.footerLink}>Privacy Policy</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={openTerms}>
-            <Text style={styles.footerLink}>Terms & Conditions</Text>
-          </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -573,19 +574,19 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#2c3e50',
-    padding: 20,
+    padding: 12,
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: 'bold',
     color: 'white',
-    marginBottom: 15,
+    marginBottom: 8,
   },
   nav: {
     flexDirection: 'row',
     gap: 20,
-    paddingTop: 15,
+    paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.2)',
   },
@@ -962,24 +963,33 @@ const styles = StyleSheet.create({
   },
   footer: {
     backgroundColor: '#2c3e50',
-    padding: 20,
+    padding: 15,
     alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
   },
   footerText: {
-    color: 'white',
-    marginBottom: 15,
+    color: 'rgba(255, 255, 255, 0.6)',
+    fontSize: 14,
+    marginBottom: 8,
+    textAlign: 'center',
   },
   footerLinks: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 20,
     justifyContent: 'center',
-    paddingTop: 15,
+    alignItems: 'center',
+    paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.2)',
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+    width: '100%',
+    maxWidth: 600,
   },
   footerLink: {
     color: 'white',
     fontSize: 14,
+    fontWeight: '500',
+    textAlign: 'center',
   },
 });
