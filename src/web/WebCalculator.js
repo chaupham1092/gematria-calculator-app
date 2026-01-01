@@ -22,7 +22,8 @@ export default function WebCalculator() {
   const [collapsedCategories, setCollapsedCategories] = useState({});
   const [allCiphers, setAllCiphers] = useState([]);
   const [categories, setCategories] = useState({});
-  const [showResearch, setShowResearch] = useState(false);
+  const [showCipherFilters, setShowCipherFilters] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
   const [targetNumber, setTargetNumber] = useState('');
 
   // Initialize ciphers and categories
@@ -244,7 +245,8 @@ export default function WebCalculator() {
 
   const openPrivacyPolicy = () => {
     setCurrentPage('privacy');
-    setShowResearch(false);
+    setShowCipherFilters(false);
+    setShowSummary(false);
   };
 
   const openTerms = () => {
@@ -278,63 +280,105 @@ export default function WebCalculator() {
     }
   };
 
+  // Helper to render the cipher filter sidebar content
+  const renderCipherFiltersContent = () => (
+    <>
+      <Text style={styles.sidebarTitle}>Filter Ciphers</Text>
+
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search ciphers..."
+        value={searchTerm}
+        onChangeText={setSearchTerm}
+      />
+
+      <View style={styles.filterActions}>
+        <TouchableOpacity style={styles.actionButton} onPress={selectAll}>
+          <Text style={styles.actionButtonText}>Select All</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton} onPress={clearAll}>
+          <Text style={styles.actionButtonText}>Clear All</Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView style={isMobile ? { maxHeight: 400 } : styles.cipherList}>
+        {Object.keys(filteredCiphers).map(category => (
+          <View key={category}>
+            <TouchableOpacity
+              style={styles.categoryHeader}
+              onPress={() => toggleCategory(category)}
+            >
+              <Text style={styles.categoryHeaderText}>{category}</Text>
+              <Text style={styles.categoryArrow}>
+                {collapsedCategories[category] ? '▶' : '▼'}
+              </Text>
+            </TouchableOpacity>
+
+            {!collapsedCategories[category] && filteredCiphers[category].map(cipher => (
+              <TouchableOpacity
+                key={cipher.name}
+                style={styles.cipherItem}
+                onPress={() => toggleCipher(cipher.name)}
+              >
+                <View style={[
+                  styles.checkbox,
+                  selectedCiphers[cipher.name] && styles.checkboxChecked
+                ]}>
+                  {selectedCiphers[cipher.name] && (
+                    <Text style={styles.checkmark}>✓</Text>
+                  )}
+                </View>
+                <Text style={styles.cipherName}>{cipher.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        ))}
+      </ScrollView>
+    </>
+  );
+
+  // Helper to render the summary sidebar content
+  const renderSummaryContent = () => (
+    <>
+      <Text style={styles.sidebarTitle}>Summary</Text>
+      <ScrollView style={isMobile ? { maxHeight: 400 } : styles.summaryList}>
+        {results.length === 0 ? (
+          <Text style={styles.emptyText}>Enter text to see summary</Text>
+        ) : targetNumber.trim() && filteredResults.length === 0 ? (
+          <Text style={styles.emptyText}>No matches for {targetNumber}</Text>
+        ) : (
+          Object.keys(groupedResults).map(category => (
+            <View key={category}>
+              <TouchableOpacity
+                style={styles.summaryCategoryHeader}
+                onPress={() => toggleCategory(`summary-${category}`)}
+              >
+                <Text style={styles.summaryCategoryText}>{category}</Text>
+                <Text style={styles.categoryArrow}>
+                  {collapsedCategories[`summary-${category}`] ? '▶' : '▼'}
+                </Text>
+              </TouchableOpacity>
+
+              {!collapsedCategories[`summary-${category}`] && groupedResults[category].map((result, index) => (
+                <View key={index} style={styles.summaryItem}>
+                  <Text style={styles.summaryName}>{result.name}</Text>
+                  <Text style={styles.summaryValue}>{result.totalValue}</Text>
+                </View>
+              ))}
+            </View>
+          ))
+        )}
+      </ScrollView>
+    </>
+  );
+
   const renderHomePage = () => {
     return (
       <View style={[styles.mainContent, isMobile && styles.mainContentMobile]}>
-        {/* Center - Input and Results (Moved to top on mobile) */}
+        {/* Left Sidebar - Desktop only */}
         {!isMobile && (
           <View style={styles.leftSidebar}>
-            <Text style={styles.sidebarTitle}>Filter Ciphers</Text>
-
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search ciphers..."
-              value={searchTerm}
-              onChangeText={setSearchTerm}
-            />
-
-            <View style={styles.filterActions}>
-              <TouchableOpacity style={styles.actionButton} onPress={selectAll}>
-                <Text style={styles.actionButtonText}>Select All</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.actionButton} onPress={clearAll}>
-                <Text style={styles.actionButtonText}>Clear All</Text>
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView style={styles.cipherList}>
-              {Object.keys(filteredCiphers).map(category => (
-                <View key={category}>
-                  <TouchableOpacity
-                    style={styles.categoryHeader}
-                    onPress={() => toggleCategory(category)}
-                  >
-                    <Text style={styles.categoryHeaderText}>{category}</Text>
-                    <Text style={styles.categoryArrow}>
-                      {collapsedCategories[category] ? '▶' : '▼'}
-                    </Text>
-                  </TouchableOpacity>
-
-                  {!collapsedCategories[category] && filteredCiphers[category].map(cipher => (
-                    <TouchableOpacity
-                      key={cipher.name}
-                      style={styles.cipherItem}
-                      onPress={() => toggleCipher(cipher.name)}
-                    >
-                      <View style={[
-                        styles.checkbox,
-                        selectedCiphers[cipher.name] && styles.checkboxChecked
-                      ]}>
-                        {selectedCiphers[cipher.name] && (
-                          <Text style={styles.checkmark}>✓</Text>
-                        )}
-                      </View>
-                      <Text style={styles.cipherName}>{cipher.name}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              ))}
-            </ScrollView>
+            {renderCipherFiltersContent()}
           </View>
         )}
 
@@ -370,66 +414,31 @@ export default function WebCalculator() {
             <View style={styles.mobileActions}>
               <TouchableOpacity
                 style={[styles.actionButton, { marginBottom: 15 }]}
-                onPress={() => setShowResearch(!showResearch)}
+                onPress={() => setShowCipherFilters(!showCipherFilters)}
               >
                 <Text style={styles.actionButtonText}>
-                  {showResearch ? 'Hide Filter' : 'Filter Ciphers'}
+                  {showCipherFilters ? 'Hide Filter' : 'Filter Ciphers'}
                 </Text>
               </TouchableOpacity>
 
-              {showResearch && (
+              {showCipherFilters && (
                 <View style={[styles.leftSidebar, { width: '100%', marginBottom: 20 }]}>
-                  <Text style={styles.sidebarTitle}>Filter Ciphers</Text>
+                  {renderCipherFiltersContent()}
+                </View>
+              )}
 
-                  <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search ciphers..."
-                    value={searchTerm}
-                    onChangeText={setSearchTerm}
-                  />
+              <TouchableOpacity
+                style={[styles.actionButton, { marginBottom: 20, backgroundColor: '#2c3e50' }]}
+                onPress={() => setShowSummary(!showSummary)}
+              >
+                <Text style={styles.actionButtonText}>
+                  {showSummary ? 'Hide Summary' : 'Show Summary'}
+                </Text>
+              </TouchableOpacity>
 
-                  <View style={styles.filterActions}>
-                    <TouchableOpacity style={styles.actionButton} onPress={selectAll}>
-                      <Text style={styles.actionButtonText}>Select All</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionButton} onPress={clearAll}>
-                      <Text style={styles.actionButtonText}>Clear All</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  <ScrollView style={{ maxHeight: 300 }}>
-                    {Object.keys(filteredCiphers).map(category => (
-                      <View key={category}>
-                        <TouchableOpacity
-                          style={styles.categoryHeader}
-                          onPress={() => toggleCategory(category)}
-                        >
-                          <Text style={styles.categoryHeaderText}>{category}</Text>
-                          <Text style={styles.categoryArrow}>
-                            {collapsedCategories[category] ? '▶' : '▼'}
-                          </Text>
-                        </TouchableOpacity>
-
-                        {!collapsedCategories[category] && filteredCiphers[category].map(cipher => (
-                          <TouchableOpacity
-                            key={cipher.name}
-                            style={styles.cipherItem}
-                            onPress={() => toggleCipher(cipher.name)}
-                          >
-                            <View style={[
-                              styles.checkbox,
-                              selectedCiphers[cipher.name] && styles.checkboxChecked
-                            ]}>
-                              {selectedCiphers[cipher.name] && (
-                                <Text style={styles.checkmark}>✓</Text>
-                              )}
-                            </View>
-                            <Text style={styles.cipherName}>{cipher.name}</Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    ))}
-                  </ScrollView>
+              {showSummary && (
+                <View style={[styles.rightSidebar, { width: '100%', marginBottom: 20 }]}>
+                  {renderSummaryContent()}
                 </View>
               )}
             </View>
@@ -480,38 +489,10 @@ export default function WebCalculator() {
           </ScrollView>
         </View>
 
-        {/* Right Sidebar - Summary (Moved to bottom on mobile or optional) */}
+        {/* Right Sidebar - Desktop only */}
         {!isMobile && (
           <View style={styles.rightSidebar}>
-            <Text style={styles.sidebarTitle}>Summary</Text>
-            <ScrollView style={styles.summaryList}>
-              {results.length === 0 ? (
-                <Text style={styles.emptyText}>Enter text to see summary</Text>
-              ) : targetNumber.trim() && filteredResults.length === 0 ? (
-                <Text style={styles.emptyText}>No matches for {targetNumber}</Text>
-              ) : (
-                Object.keys(groupedResults).map(category => (
-                  <View key={category}>
-                    <TouchableOpacity
-                      style={styles.summaryCategoryHeader}
-                      onPress={() => toggleCategory(`summary-${category}`)}
-                    >
-                      <Text style={styles.summaryCategoryText}>{category}</Text>
-                      <Text style={styles.categoryArrow}>
-                        {collapsedCategories[`summary-${category}`] ? '▶' : '▼'}
-                      </Text>
-                    </TouchableOpacity>
-
-                    {!collapsedCategories[`summary-${category}`] && groupedResults[category].map((result, index) => (
-                      <View key={index} style={styles.summaryItem}>
-                        <Text style={styles.summaryName}>{result.name}</Text>
-                        <Text style={styles.summaryValue}>{result.totalValue}</Text>
-                      </View>
-                    ))}
-                  </View>
-                ))
-              )}
-            </ScrollView>
+            {renderSummaryContent()}
           </View>
         )}
       </View>
@@ -527,31 +508,36 @@ export default function WebCalculator() {
           <View style={[styles.nav, isMobile && styles.navMobile]}>
             <TouchableOpacity onPress={() => {
               setCurrentPage('home');
-              setShowResearch(false);
+              setShowCipherFilters(false);
+              setShowSummary(false);
             }}>
               <Text style={[styles.navLink, currentPage === 'home' && styles.navLinkActive]}>Home</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => {
               setCurrentPage('research');
-              setShowResearch(false);
+              setShowCipherFilters(false);
+              setShowSummary(false);
             }}>
               <Text style={[styles.navLink, currentPage === 'research' && styles.navLinkActive]}>Research</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => {
               setCurrentPage('about');
-              setShowResearch(false);
+              setShowCipherFilters(false);
+              setShowSummary(false);
             }}>
               <Text style={[styles.navLink, currentPage === 'about' && styles.navLinkActive]}>About</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => {
               setCurrentPage('contact');
-              setShowResearch(false);
+              setShowCipherFilters(false);
+              setShowSummary(false);
             }}>
               <Text style={[styles.navLink, currentPage === 'contact' && styles.navLinkActive]}>Contact</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => {
               setCurrentPage('download');
-              setShowResearch(false);
+              setShowCipherFilters(false);
+              setShowSummary(false);
             }}>
               <Text style={[styles.navLink, currentPage === 'download' && styles.navLinkActive]}>App</Text>
             </TouchableOpacity>
