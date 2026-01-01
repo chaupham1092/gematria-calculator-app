@@ -244,7 +244,7 @@ export default function WebCalculator() {
   };
 
   const openTerms = () => {
-    Linking.openURL('/pages/terms.html');
+    Linking.openURL('https://www.privacypolicies.com/live/37ea9a23-b763-496d-a552-702e87742679');
   };
 
   // Render different pages based on currentPage state

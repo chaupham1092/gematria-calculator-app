@@ -138,6 +138,10 @@ const AboutScreen = () => {
                 title="Privacy Policy"
                 onPress={() => setPrivacyModalVisible(true)}
               />
+              <LearnMoreItem
+                title="Terms & Conditions"
+                url="https://www.privacypolicies.com/live/37ea9a23-b763-496d-a552-702e87742679"
+              />
             </View>
           </View>
         </ScrollView>
