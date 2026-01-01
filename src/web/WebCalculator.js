@@ -6,6 +6,7 @@ import { decodeSharedCollection } from '../utils/researchStorage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import DownloadPage from './pages/DownloadPage';
+import PrivacyPage from './pages/PrivacyPage';
 import ResearchCollection from './components/ResearchCollection';
 import { saveToResearch } from '../utils/researchStorage';
 
@@ -238,11 +239,12 @@ export default function WebCalculator() {
   }, {});
 
   const openPrivacyPolicy = () => {
-    Linking.openURL('https://gematriacalculator.xyz/pages/privacy.html');
+    setCurrentPage('privacy');
+    setShowResearch(false);
   };
 
   const openTerms = () => {
-    Linking.openURL('https://gematriacalculator.xyz/pages/terms.html');
+    Linking.openURL('/pages/terms.html');
   };
 
   // Render different pages based on currentPage state
@@ -265,6 +267,8 @@ export default function WebCalculator() {
         return <ContactPage />;
       case 'download':
         return <DownloadPage />;
+      case 'privacy':
+        return <PrivacyPage />;
       default:
         return renderHomePage();
     }
