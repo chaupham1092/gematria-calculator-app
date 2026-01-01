@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 
 export default function ContactPage() {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -56,9 +59,9 @@ export default function ContactPage() {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, isMobile && styles.containerMobile]}>
       <Text style={styles.title}>Contact Us</Text>
-      
+
       {/* Hidden form for Netlify to detect */}
       <form name="contact" data-netlify="true" hidden>
         <input type="text" name="name" />
@@ -66,11 +69,11 @@ export default function ContactPage() {
         <input type="text" name="subject" />
         <textarea name="message"></textarea>
       </form>
-      
+
       <View style={styles.content}>
-        <View style={styles.formContainer}>
+        <View style={[styles.formContainer, isMobile && styles.formContainerMobile]}>
           <Text style={styles.paragraph}>
-            Have questions, suggestions, or feedback about our Gematria Calculator? We'd love to hear from you! 
+            Have questions, suggestions, or feedback about our Gematria Calculator? We'd love to hear from you!
             Fill out the form below and we'll get back to you as soon as possible.
           </Text>
 
@@ -141,11 +144,11 @@ export default function ContactPage() {
 
         <View style={styles.faqSection}>
           <Text style={styles.heading}>Frequently Asked Questions</Text>
-          
+
           <View style={styles.faqItem}>
             <Text style={styles.faqQuestion}>How accurate is the Gematria Calculator?</Text>
             <Text style={styles.faqAnswer}>
-              Our calculator implements traditional gematria ciphers with high accuracy. We regularly review and 
+              Our calculator implements traditional gematria ciphers with high accuracy. We regularly review and
               update our algorithms to ensure they align with established numerological systems.
             </Text>
           </View>
@@ -153,7 +156,7 @@ export default function ContactPage() {
           <View style={styles.faqItem}>
             <Text style={styles.faqQuestion}>Can I suggest a new cipher to be added?</Text>
             <Text style={styles.faqAnswer}>
-              Absolutely! We welcome suggestions for new ciphers. Please use the contact form above and provide 
+              Absolutely! We welcome suggestions for new ciphers. Please use the contact form above and provide
               details about the cipher you'd like to see added.
             </Text>
           </View>
@@ -161,7 +164,7 @@ export default function ContactPage() {
           <View style={styles.faqItem}>
             <Text style={styles.faqQuestion}>Is there an API available for the calculator?</Text>
             <Text style={styles.faqAnswer}>
-              We're currently developing an API for developers who want to integrate our gematria calculations 
+              We're currently developing an API for developers who want to integrate our gematria calculations
               into their applications. Contact us for more information about beta access.
             </Text>
           </View>
@@ -169,8 +172,8 @@ export default function ContactPage() {
           <View style={styles.faqItem}>
             <Text style={styles.faqQuestion}>How can I report a bug or issue?</Text>
             <Text style={styles.faqAnswer}>
-              If you encounter any bugs or issues while using our calculator, please let us know through the 
-              contact form. Include as much detail as possible, including the text you entered, the browser 
+              If you encounter any bugs or issues while using our calculator, please let us know through the
+              contact form. Include as much detail as possible, including the text you entered, the browser
               you're using, and any error messages you received.
             </Text>
           </View>
@@ -186,8 +189,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 40,
   },
+  containerMobile: {
+    padding: 20,
+  },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#2c3e50',
     marginBottom: 30,
@@ -206,9 +212,12 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
     marginBottom: 40,
   },
+  formContainerMobile: {
+    padding: 20,
+  },
   paragraph: {
-    fontSize: 16,
-    lineHeight: 28,
+    fontSize: 15,
+    lineHeight: 25,
     color: '#333',
     marginBottom: 25,
   },
@@ -216,7 +225,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: '#333',
     marginBottom: 8,
@@ -269,9 +278,10 @@ const styles = StyleSheet.create({
   },
   faqSection: {
     marginTop: 20,
+    marginBottom: 40,
   },
   heading: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#2c3e50',
     marginBottom: 20,
@@ -292,8 +302,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   faqAnswer: {
-    fontSize: 16,
-    lineHeight: 26,
+    fontSize: 15,
+    lineHeight: 24,
     color: '#555',
   },
 });

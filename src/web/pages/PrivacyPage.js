@@ -1,9 +1,12 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, Linking } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Linking, useWindowDimensions } from 'react-native';
 
 export default function PrivacyPage() {
+    const { width } = useWindowDimensions();
+    const isMobile = width < 768;
+
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView style={[styles.container, isMobile && styles.containerMobile]}>
             <Text style={styles.title}>Privacy Policy</Text>
 
             <View style={styles.content}>
@@ -132,15 +135,18 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         padding: 40,
     },
+    containerMobile: {
+        padding: 20,
+    },
     title: {
-        fontSize: 32,
+        fontSize: 28,
         fontWeight: 'bold',
         color: '#2c3e50',
         marginBottom: 10,
         textAlign: 'center',
     },
     lastUpdated: {
-        fontSize: 14,
+        fontSize: 13,
         color: '#666',
         textAlign: 'center',
         marginBottom: 30,
@@ -153,10 +159,10 @@ const styles = StyleSheet.create({
         paddingBottom: 60,
     },
     heading: {
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: 'bold',
         color: '#2c3e50',
-        marginTop: 30,
+        marginTop: 25,
         marginBottom: 15,
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
@@ -177,14 +183,14 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     paragraph: {
-        fontSize: 16,
-        lineHeight: 26,
+        fontSize: 15,
+        lineHeight: 24,
         color: '#333',
         marginBottom: 15,
     },
     listItem: {
-        fontSize: 16,
-        lineHeight: 26,
+        fontSize: 15,
+        lineHeight: 24,
         color: '#333',
         marginBottom: 8,
         paddingLeft: 10,
@@ -194,7 +200,7 @@ const styles = StyleSheet.create({
     },
     link: {
         color: '#3498db',
-        fontSize: 16,
+        fontSize: 15,
         marginBottom: 15,
         textDecorationLine: 'underline',
     },

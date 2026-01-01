@@ -1,22 +1,25 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, Linking, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Linking, TouchableOpacity, useWindowDimensions } from 'react-native';
 
 export default function DownloadPage() {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
+
   const openAppStore = () => {
     Linking.openURL('https://apps.apple.com/us/app/gematria-calculator-decode/id6744337544');
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, isMobile && styles.containerMobile]}>
       <Text style={styles.title}>Download Gematria Calculator App</Text>
-      
+
       <View style={styles.content}>
         <Text style={styles.intro}>
-          Unlock the power of numbers—our Gematria Calculator now supports major Hebrew and English ciphers, 
+          Unlock the power of numbers—our Gematria Calculator now supports major Hebrew and English ciphers,
           with improved accuracy and custom cipher options!
         </Text>
 
-        <View style={styles.downloadCards}>
+        <View style={[styles.downloadCards, isMobile && styles.verticalStack]}>
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Gematria Calculator for iOS</Text>
             <Text style={styles.cardText}>
@@ -40,7 +43,7 @@ export default function DownloadPage() {
         </View>
 
         <Text style={styles.heading}>App Features</Text>
-        <View style={styles.featureColumns}>
+        <View style={[styles.featureColumns, isMobile && styles.verticalStack]}>
           <View style={styles.featureColumn}>
             <Text style={styles.bulletPoint}>• Supports Hebrew and English Ciphers</Text>
             <Text style={styles.bulletPoint}>• Real-time calculation as you type</Text>
@@ -56,14 +59,14 @@ export default function DownloadPage() {
         </View>
 
         <Text style={styles.paragraph}>
-          Explore hidden meanings in words with the Gematria Calculator. This app makes it easy to calculate 
-          the numerical value of any word or phrase using traditional gematria systems. Whether you're studying 
-          ancient texts, exploring spiritual symbolism, or just curious, this tool helps you decode with accuracy 
+          Explore hidden meanings in words with the Gematria Calculator. This app makes it easy to calculate
+          the numerical value of any word or phrase using traditional gematria systems. Whether you're studying
+          ancient texts, exploring spiritual symbolism, or just curious, this tool helps you decode with accuracy
           and ease.
         </Text>
 
         <Text style={styles.heading}>System Requirements</Text>
-        <View style={styles.requirementsGrid}>
+        <View style={[styles.requirementsGrid, isMobile && styles.verticalStack]}>
           <View style={styles.requirement}>
             <Text style={styles.requirementTitle}>iOS</Text>
             <Text style={styles.requirementText}>Requires iOS 14.0 or later</Text>
@@ -86,8 +89,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 40,
   },
+  containerMobile: {
+    padding: 20,
+  },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#2c3e50',
     marginBottom: 30,
@@ -99,26 +105,30 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   intro: {
-    fontSize: 18,
-    lineHeight: 28,
+    fontSize: 16,
+    lineHeight: 24,
     color: '#2c3e50',
     fontWeight: '500',
     marginBottom: 30,
-    padding: 20,
+    padding: 15,
     backgroundColor: '#f0f7ff',
     borderRadius: 8,
     textAlign: 'center',
   },
   downloadCards: {
     flexDirection: 'row',
-    gap: 30,
+    gap: 20,
     marginBottom: 40,
+  },
+  verticalStack: {
+    flexDirection: 'column',
+    gap: 15,
   },
   card: {
     flex: 1,
     backgroundColor: 'white',
     borderRadius: 12,
-    padding: 30,
+    padding: 25,
     borderWidth: 1,
     borderColor: '#e0e0e0',
     shadowColor: '#000',
@@ -128,7 +138,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   cardTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#2c3e50',
     marginBottom: 10,
@@ -145,8 +155,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   cardText: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 14,
+    lineHeight: 22,
     color: '#666',
     marginBottom: 20,
   },
@@ -171,58 +181,58 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   heading: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#2c3e50',
-    marginTop: 40,
+    marginTop: 30,
     marginBottom: 20,
   },
   featureColumns: {
     flexDirection: 'row',
-    gap: 30,
+    gap: 20,
     marginBottom: 30,
   },
   featureColumn: {
     flex: 1,
     backgroundColor: '#f9f9f9',
-    padding: 20,
+    padding: 15,
     borderRadius: 8,
   },
   bulletPoint: {
-    fontSize: 16,
-    lineHeight: 28,
+    fontSize: 14,
+    lineHeight: 24,
     color: '#333',
     marginBottom: 8,
   },
   paragraph: {
-    fontSize: 16,
-    lineHeight: 28,
+    fontSize: 15,
+    lineHeight: 25,
     color: '#333',
     marginBottom: 15,
-    textAlign: 'justify',
   },
   requirementsGrid: {
     flexDirection: 'row',
-    gap: 30,
+    gap: 20,
     marginTop: 20,
+    marginBottom: 40,
   },
   requirement: {
     flex: 1,
     backgroundColor: 'white',
-    padding: 20,
+    padding: 15,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#e0e0e0',
   },
   requirementTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#2c3e50',
     marginBottom: 10,
   },
   requirementText: {
-    fontSize: 14,
-    lineHeight: 22,
+    fontSize: 13,
+    lineHeight: 20,
     color: '#666',
     marginBottom: 5,
   },

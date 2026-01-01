@@ -1,30 +1,33 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 
 export default function AboutPage() {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, isMobile && styles.containerMobile]}>
       <Text style={styles.title}>About Gematria</Text>
-      
+
       <View style={styles.content}>
         <Text style={styles.heading}>What is Gematria?</Text>
         <Text style={styles.paragraph}>
-          Gematria is a numerological system that assigns numerical values to letters, words, and phrases. 
-          While it has roots in various ancient cultures, it is most commonly associated with Hebrew mysticism 
-          and Kabbalah. The word "gematria" itself comes from the Greek word "geometria" (geometry), 
+          Gematria is a numerological system that assigns numerical values to letters, words, and phrases.
+          While it has roots in various ancient cultures, it is most commonly associated with Hebrew mysticism
+          and Kabbalah. The word "gematria" itself comes from the Greek word "geometria" (geometry),
           highlighting its connection to mathematical principles.
         </Text>
-        
+
         <Text style={styles.paragraph}>
-          At its core, gematria is based on the belief that there is a meaningful relationship between numbers 
-          and words. By converting letters to numbers and analyzing these numerical values, practitioners believe 
-          they can uncover hidden meanings, connections, and insights within texts that might not be apparent on 
+          At its core, gematria is based on the belief that there is a meaningful relationship between numbers
+          and words. By converting letters to numbers and analyzing these numerical values, practitioners believe
+          they can uncover hidden meanings, connections, and insights within texts that might not be apparent on
           the surface.
         </Text>
 
         <Text style={styles.heading}>Historical Origins</Text>
         <Text style={styles.paragraph}>
-          The practice of assigning numerical values to letters dates back thousands of years and appears in 
+          The practice of assigning numerical values to letters dates back thousands of years and appears in
           multiple cultures:
         </Text>
         <Text style={styles.bulletPoint}>• Hebrew Tradition: Gematria became a significant part of Jewish mysticism</Text>
@@ -44,8 +47,8 @@ export default function AboutPage() {
 
         <Text style={styles.heading}>Modern Relevance</Text>
         <Text style={styles.paragraph}>
-          Today, gematria continues to be studied and practiced by religious scholars, numerologists, and those 
-          interested in the mystical properties of numbers. Our Gematria Calculator allows you to explore these 
+          Today, gematria continues to be studied and practiced by religious scholars, numerologists, and those
+          interested in the mystical properties of numbers. Our Gematria Calculator allows you to explore these
           ancient traditions with modern technology, calculating values across multiple cipher systems instantly.
         </Text>
       </View>
@@ -59,8 +62,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 40,
   },
+  containerMobile: {
+    padding: 20,
+  },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#2c3e50',
     marginBottom: 30,
@@ -72,10 +78,10 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   heading: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#2c3e50',
-    marginTop: 30,
+    marginTop: 25,
     marginBottom: 15,
   },
   subheading: {
@@ -86,17 +92,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   paragraph: {
-    fontSize: 16,
-    lineHeight: 28,
+    fontSize: 15,
+    lineHeight: 25,
     color: '#333',
     marginBottom: 15,
-    textAlign: 'justify',
   },
   bulletPoint: {
-    fontSize: 16,
-    lineHeight: 28,
+    fontSize: 15,
+    lineHeight: 24,
     color: '#333',
     marginBottom: 8,
-    paddingLeft: 20,
+    paddingLeft: 10,
   },
 });
