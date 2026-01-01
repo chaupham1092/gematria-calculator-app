@@ -2,6 +2,9 @@
   command = "npx expo export:web"
   publish = "web-build"
 
+[functions]
+  directory = "netlify/functions"
+
 [build.environment]
   NODE_VERSION = "20"
 
