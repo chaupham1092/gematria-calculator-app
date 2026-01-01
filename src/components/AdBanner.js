@@ -1,17 +1,14 @@
 import React from 'react';
 import { Platform, View, StyleSheet } from 'react-native';
-import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+// import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 
-// Use TestIds.BANNER for development to avoid account bans
-// Replace these with your real Ad Unit IDs for production
-const adUnitId = __DEV__
-    ? TestIds.BANNER
-    : Platform.select({
-        ios: 'ca-app-pub-xxxxxxxxxxxxxxxx/xxxxxxxxxx', // REPLACE THIS
-        android: 'ca-app-pub-xxxxxxxxxxxxxxxx/xxxxxxxxxx', // REPLACE THIS
-    });
+const adUnitId = 'test'; // Placeholder
 
 const AdBanner = () => {
+    // TEMPORARILY DISABLED FOR EXPO GO TESTING
+    return null;
+
+    /*
     // Don't render ads on web
     if (Platform.OS === 'web') return null;
 
@@ -26,6 +23,7 @@ const AdBanner = () => {
             />
         </View>
     );
+    */
 };
 
 const styles = StyleSheet.create({

@@ -73,7 +73,7 @@ export default function WebCalculator() {
   }, [allCiphers]);
 
   // Handle incoming shared calculations
-  const handleSharedCalculation = () => {
+  const handleSharedCalculation = async () => {
     try {
       const urlParams = new URLSearchParams(window.location.search);
       const calcParam = urlParams.get('calc');
@@ -104,33 +104,58 @@ export default function WebCalculator() {
 
         if (entries && entries.length > 0) {
           // Import all entries into localStorage
-          const { saveToResearch } = require('../utils/researchStorage');
+          const { importResearchCollection } = require('../utils/researchStorage');
 
-          entries.forEach(entry => {
-            console.log('Processing entry:', entry);
-
-            // Build cipher selection object
+          // Convert the light shared format back to full research entries format before importing
+          // or modify importResearchCollection to handle this.
+          // Since importResearchCollection expects full entries, let's adapt the shared entries to full entries manually here first.
+          const fullEntries = entries.map(entry => {
             const cipherSelection = {};
-            allCiphers.forEach(cipher => {
-              cipherSelection[cipher.name] = entry.ciphers && entry.ciphers.includes(cipher.name);
-            });
+            // Construct cipher selection object from array of keys
+            if (entry.ciphers && Array.isArray(entry.ciphers)) {
+              entry.ciphers.forEach(cipherKey => {
+                cipherSelection[cipherKey] = true;
+              });
+            }
 
-            console.log('Cipher selection:', cipherSelection);
-
-            // Calculate results for this entry using the same logic as the main calculator
+            // Calculate results on the fly
             const results = calculateGematria(entry.text, cipherSelection);
-            console.log('Calculated results:', results);
 
-            // Save to research collection with calculated results
-            saveToResearch(entry.text, cipherSelection, results, entry.note || '', entry.tags || []);
+            return {
+              id: Date.now().toString() + Math.random().toString(36).substr(2, 9), // Unique ID
+              text: entry.text,
+              timestamp: Date.now(),
+              note: entry.note || '',
+              selectedCiphers: cipherSelection,
+              results: results,
+              tags: entry.tags || []
+            };
           });
 
-          console.log('Navigating to research page...');
-          // Navigate to research page
-          setCurrentPage('research');
+          // We use a custom merging logic here to ensure we save them all correctly
+          // We can't use importResearchCollection directly because it expects potentially different structure or overrides
+          // Let's use saveToResearch sequentially to ensure they are added one by one safely
+          const { saveToResearch } = require('../utils/researchStorage');
 
-          // Clear URL parameters
-          window.history.replaceState({}, document.title, window.location.pathname);
+          let importCount = 0;
+          for (const entry of fullEntries) {
+            try {
+              await saveToResearch(entry.text, entry.selectedCiphers, entry.results, entry.note, entry.tags);
+              importCount++;
+            } catch (e) {
+              console.error("Error importing entry:", entry.text, e);
+            }
+          }
+
+          if (importCount > 0) {
+            alert(`Successfully imported ${importCount} research entries!`);
+            console.log('Navigating to research page...');
+            // Navigate to research page
+            setCurrentPage('research');
+
+            // Clear URL parameters to prevent re-import on refresh
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
         }
       }
     } catch (error) {

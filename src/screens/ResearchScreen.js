@@ -33,10 +33,11 @@ const ResearchScreen = ({ navigation, selectedCiphers, setSelectedCiphers }) => 
     }, [])
   );
 
-  const loadResearch = () => {
-    const data = getResearchCollection();
+  const loadResearch = async () => {
+    const data = await getResearchCollection();
     setResearch(data);
-    setStats(getResearchStats());
+    const statsData = await getResearchStats();
+    setStats(statsData);
   };
 
   const handleDelete = (id) => {
@@ -88,11 +89,11 @@ const ResearchScreen = ({ navigation, selectedCiphers, setSelectedCiphers }) => 
   const handleLoad = (entry) => {
     // Update selected ciphers
     setSelectedCiphers(entry.selectedCiphers);
-    
+
     // Navigate to Calculator with the text
-    navigation.navigate('Calculator', { 
+    navigation.navigate('Calculator', {
       loadedText: entry.text,
-      loadedCiphers: entry.selectedCiphers 
+      loadedCiphers: entry.selectedCiphers
     });
   };
 
@@ -109,10 +110,10 @@ const ResearchScreen = ({ navigation, selectedCiphers, setSelectedCiphers }) => 
     try {
       // Show loading state
       Alert.alert('Shortening URL...', 'Please wait');
-      
+
       // Shorten the URL using is.gd
       const shortenedUrl = await shortenUrl(url);
-      
+
       // Try native share first with shortened URL
       await RNShare.share({
         message: `Check out my Gematria research collection: ${shortenedUrl}`,
@@ -136,9 +137,9 @@ const ResearchScreen = ({ navigation, selectedCiphers, setSelectedCiphers }) => 
 
   const formatDate = (timestamp) => {
     const date = new Date(timestamp);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
@@ -146,7 +147,7 @@ const ResearchScreen = ({ navigation, selectedCiphers, setSelectedCiphers }) => 
     if (!entry.results || entry.results.length === 0) {
       return [];
     }
-    
+
     return entry.results
       .filter(r => r && r.totalValue !== undefined)
       .sort((a, b) => b.totalValue - a.totalValue)
@@ -176,14 +177,14 @@ const ResearchScreen = ({ navigation, selectedCiphers, setSelectedCiphers }) => 
 
         {/* Action Buttons */}
         <View style={styles.actions}>
-          <TouchableOpacity 
-            style={styles.shareButton} 
+          <TouchableOpacity
+            style={styles.shareButton}
             onPress={handleShareCollection}
           >
             <Text style={styles.buttonText}>📤 Share All</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.deleteAllButton} 
+          <TouchableOpacity
+            style={styles.deleteAllButton}
             onPress={handleDeleteAll}
           >
             <Text style={styles.buttonText}>🗑️ Delete All</Text>
@@ -208,7 +209,7 @@ const ResearchScreen = ({ navigation, selectedCiphers, setSelectedCiphers }) => 
               return (
                 <View key={entry.id} style={styles.entryCard}>
                   {/* Header */}
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.entryHeader}
                     onPress={() => toggleExpand(entry.id)}
                   >
@@ -241,7 +242,7 @@ const ResearchScreen = ({ navigation, selectedCiphers, setSelectedCiphers }) => 
                       <Text style={styles.expandedTitle}>
                         All Results ({entry.results.length})
                       </Text>
-                      <ScrollView 
+                      <ScrollView
                         style={styles.detailedResults}
                         nestedScrollEnabled
                       >
@@ -263,13 +264,13 @@ const ResearchScreen = ({ navigation, selectedCiphers, setSelectedCiphers }) => 
 
                   {/* Actions */}
                   <View style={styles.entryActions}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       style={styles.entryActionButton}
                       onPress={() => handleLoad(entry)}
                     >
                       <Text style={styles.entryActionText}>📥 Load</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       style={[styles.entryActionButton, styles.deleteButton]}
                       onPress={() => handleDelete(entry.id)}
                     >
