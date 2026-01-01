@@ -20,6 +20,7 @@ import {
   getResearchStats,
 } from '../utils/researchStorage';
 import * as Clipboard from 'expo-clipboard';
+import { shortenUrl } from '../utils/shareUtils';
 
 const ResearchScreen = ({ navigation, selectedCiphers, setSelectedCiphers }) => {
   const [research, setResearch] = useState([]);
@@ -104,34 +105,45 @@ const ResearchScreen = ({ navigation, selectedCiphers, setSelectedCiphers }) => 
     }
 
     const encoded = shareResearchCollection(research);
-    const baseUrl = 'https://gematriacalculator.xyz'; // Your production domain
+    const baseUrl = 'https://gematriacalculator.xyz';
     const url = `${baseUrl}?collection=${encoded}`;
 
     try {
-      // Show loading state
-      Alert.alert('Shortening URL...', 'Please wait');
-
-      // Shorten the URL using is.gd
+      // Use Clipboard as primary share feedback for mobile
+      // Shortening happen in background
       const shortenedUrl = await shortenUrl(url);
 
-      // Try native share first with shortened URL
-      await RNShare.share({
-        message: `Check out my Gematria research collection: ${shortenedUrl}`,
-        url: shortenedUrl,
-        title: 'Share Research Collection',
-      });
-    } catch (error) {
-      // Fallback to clipboard with shortened URL
-      try {
-        // Try to shorten even in fallback
-        const shortenedUrl = await shortenUrl(url);
+      if (shortenedUrl !== url) {
         await Clipboard.setStringAsync(shortenedUrl);
-        Alert.alert('Link Copied', `Short link copied to clipboard!\n\n${shortenedUrl}`);
-      } catch (clipError) {
-        // Last resort - use full URL
+        Alert.alert('Link Shortened & Copied', `The shortened link is ready to share:\n\n${shortenedUrl}`, [
+          {
+            text: 'Share Now',
+            onPress: () => RNShare.share({
+              message: `Check out my Gematria research collection: ${shortenedUrl}`,
+              url: shortenedUrl,
+              title: 'Share Research Collection',
+            })
+          },
+          { text: 'OK', style: 'cancel' }
+        ]);
+      } else {
+        // Shortening failed or returned same URL
         await Clipboard.setStringAsync(url);
-        Alert.alert('Link Copied', 'Link copied to clipboard!');
+        Alert.alert('Link Copied', 'The research collection link has been copied to your clipboard.', [
+          {
+            text: 'Share Now',
+            onPress: () => RNShare.share({
+              message: `Check out my Gematria research collection: ${url}`,
+              url: url,
+              title: 'Share Research Collection',
+            })
+          },
+          { text: 'OK', style: 'cancel' }
+        ]);
       }
+    } catch (error) {
+      await Clipboard.setStringAsync(url);
+      Alert.alert('Link Copied', 'The link was copied to clipboard.');
     }
   };
 
@@ -158,138 +170,138 @@ const ResearchScreen = ({ navigation, selectedCiphers, setSelectedCiphers }) => 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Research List</Text>
-          {stats && (
-            <View>
-              <Text style={styles.subtitle}>
-                {stats.totalEntries} of {stats.maxEntries} entries ({stats.percentFull}% full)
-              </Text>
-              {stats.percentFull >= 80 && (
-                <Text style={styles.warningText}>
-                  ⚠️ Storage is {stats.percentFull}% full
+        <ScrollView
+          style={styles.mainScrollView}
+          contentContainerStyle={styles.scrollContent}
+          alwaysBounceVertical={true}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.title}>Research List</Text>
+            {stats && (
+              <View>
+                <Text style={styles.subtitle}>
+                  {stats.totalEntries} of {stats.maxEntries} entries ({stats.percentFull}% full)
                 </Text>
-              )}
-            </View>
-          )}
-        </View>
+                {stats.percentFull >= 80 && (
+                  <Text style={styles.warningText}>
+                    ⚠️ Storage is {stats.percentFull}% full
+                  </Text>
+                )}
+              </View>
+            )}
+          </View>
 
-        {/* Action Buttons */}
-        <View style={styles.actions}>
-          <TouchableOpacity
-            style={styles.shareButton}
-            onPress={handleShareCollection}
-          >
-            <Text style={styles.buttonText}>📤 Share All</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.deleteAllButton}
-            onPress={handleDeleteAll}
-          >
-            <Text style={styles.buttonText}>🗑️ Delete All</Text>
-          </TouchableOpacity>
-        </View>
+          {/* Action Buttons */}
+          <View style={styles.actions}>
+            <TouchableOpacity
+              style={styles.shareButton}
+              onPress={handleShareCollection}
+            >
+              <Text style={styles.buttonText}>📤 Share All</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.deleteAllButton}
+              onPress={handleDeleteAll}
+            >
+              <Text style={styles.buttonText}>🗑️ Delete All</Text>
+            </TouchableOpacity>
+          </View>
 
-        {/* Research List */}
-        <ScrollView style={styles.list}>
-          {research.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyIcon}>📝</Text>
-              <Text style={styles.emptyText}>No research saved yet</Text>
-              <Text style={styles.emptySubtext}>
-                Go to Calculator and tap "Save to Research" to start building your collection
-              </Text>
-            </View>
-          ) : (
-            research.map((entry) => {
-              const isExpanded = expandedIds.has(entry.id);
-              const topCiphers = getTopCiphers(entry);
+          {/* Research List */}
+          <View style={styles.list}>
+            {research.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyIcon}>📝</Text>
+                <Text style={styles.emptyText}>No research saved yet</Text>
+                <Text style={styles.emptySubtext}>
+                  Go to Calculator and tap "Save to Research" to start building your collection
+                </Text>
+              </View>
+            ) : (
+              research.map((entry) => {
+                const isExpanded = expandedIds.has(entry.id);
+                const topCiphers = getTopCiphers(entry);
 
-              return (
-                <View key={entry.id} style={styles.entryCard}>
-                  {/* Header */}
-                  <TouchableOpacity
-                    style={styles.entryHeader}
-                    onPress={() => toggleExpand(entry.id)}
-                  >
-                    <View style={styles.entryHeaderLeft}>
-                      <Text style={styles.entryText} numberOfLines={2}>
-                        "{entry.text}"
-                      </Text>
-                      <Text style={styles.entryDate}>{formatDate(entry.timestamp)}</Text>
-                    </View>
-                    <View style={styles.entryHeaderRight}>
-                      <Text style={styles.expandIcon}>{isExpanded ? '▼' : '▶'}</Text>
-                    </View>
-                  </TouchableOpacity>
+                return (
+                  <View key={entry.id} style={styles.entryCard}>
+                    {/* Header */}
+                    <TouchableOpacity
+                      style={styles.entryHeader}
+                      onPress={() => toggleExpand(entry.id)}
+                    >
+                      <View style={styles.entryHeaderLeft}>
+                        <Text style={styles.entryText} numberOfLines={2}>
+                          "{entry.text}"
+                        </Text>
+                        <Text style={styles.entryDate}>{formatDate(entry.timestamp)}</Text>
+                      </View>
+                      <View style={styles.entryHeaderRight}>
+                        <Text style={styles.expandIcon}>{isExpanded ? '▼' : '▶'}</Text>
+                      </View>
+                    </TouchableOpacity>
 
-                  {/* Quick View - Top 3 */}
-                  {topCiphers.length > 0 && (
-                    <View style={styles.quickResults}>
-                      {topCiphers.map((cipher, idx) => (
-                        <View key={idx} style={styles.quickResultItem}>
-                          <Text style={styles.quickResultName}>{cipher.name}</Text>
-                          <Text style={styles.quickResultValue}>{cipher.value}</Text>
-                        </View>
-                      ))}
-                    </View>
-                  )}
-
-                  {/* Expanded View */}
-                  {isExpanded && entry.results && entry.results.length > 0 && (
-                    <View style={styles.expandedContent}>
-                      <Text style={styles.expandedTitle}>
-                        All Results ({entry.results.length})
-                      </Text>
-                      <ScrollView
-                        style={styles.detailedResults}
-                        nestedScrollEnabled
-                      >
-                        {entry.results.map((result, idx) => (
-                          <View key={idx} style={styles.detailedResultItem}>
-                            <View style={styles.detailedResultHeader}>
-                              <Text style={styles.detailedResultName}>
-                                {result.name}
-                              </Text>
-                              <Text style={styles.detailedResultValue}>
-                                {result.totalValue}
-                              </Text>
-                            </View>
+                    {/* Quick View - Top 3 */}
+                    {topCiphers.length > 0 && (
+                      <View style={styles.quickResults}>
+                        {topCiphers.map((cipher, idx) => (
+                          <View key={idx} style={styles.quickResultItem}>
+                            <Text style={styles.quickResultName}>{cipher.name}</Text>
+                            <Text style={styles.quickResultValue}>{cipher.value}</Text>
                           </View>
                         ))}
-                      </ScrollView>
+                      </View>
+                    )}
+
+                    {/* Expanded View */}
+                    {isExpanded && entry.results && entry.results.length > 0 && (
+                      <View style={styles.expandedContent}>
+                        <Text style={styles.expandedTitle}>
+                          All Results ({entry.results.length})
+                        </Text>
+                        <ScrollView
+                          style={styles.detailedResults}
+                          nestedScrollEnabled
+                        >
+                          {entry.results.map((result, idx) => (
+                            <View key={idx} style={styles.detailedResultItem}>
+                              <View style={styles.detailedResultHeader}>
+                                <Text style={styles.detailedResultName}>
+                                  {result.name}
+                                </Text>
+                                <Text style={styles.detailedResultValue}>
+                                  {result.totalValue}
+                                </Text>
+                              </View>
+                            </View>
+                          ))}
+                        </ScrollView>
+                      </View>
+                    )}
+
+                    {/* Actions */}
+                    <View style={styles.entryActions}>
+                      <TouchableOpacity
+                        style={styles.entryActionButton}
+                        onPress={() => handleLoad(entry)}
+                      >
+                        <Text style={styles.entryActionText}>📥 Load</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.entryActionButton, styles.deleteButton]}
+                        onPress={() => handleDelete(entry.id)}
+                      >
+                        <Text style={styles.entryActionText}>🗑️ Delete</Text>
+                      </TouchableOpacity>
                     </View>
-                  )}
-
-                  {/* Actions */}
-                  <View style={styles.entryActions}>
-                    <TouchableOpacity
-                      style={styles.entryActionButton}
-                      onPress={() => handleLoad(entry)}
-                    >
-                      <Text style={styles.entryActionText}>📥 Load</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.entryActionButton, styles.deleteButton]}
-                      onPress={() => handleDelete(entry.id)}
-                    >
-                      <Text style={styles.entryActionText}>🗑️ Delete</Text>
-                    </TouchableOpacity>
                   </View>
-                </View>
-              );
-            })
-          )}
-        </ScrollView>
-
-        {research.length === 0 && (
-          <View style={styles.emptyHint}>
-            <Text style={styles.emptyHintText}>
-              💡 Tap "Save to Research" in Calculator to start
-            </Text>
+                );
+              })
+            )}
           </View>
-        )}
+
+        </ScrollView>
       </View>
     </SafeAreaView>
   );
@@ -302,6 +314,12 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+  },
+  mainScrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   header: {
     backgroundColor: colors.white,

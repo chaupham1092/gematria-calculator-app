@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -35,6 +35,7 @@ const getDefaultCipherSelections = () => {
 const AppNavigator = () => {
   const [selectedCiphers, setSelectedCiphers] = useState(getDefaultCipherSelections());
   const [isLoading, setIsLoading] = useState(true);
+  const navigationRef = useRef();
 
   // Load saved cipher selections from AsyncStorage
   useEffect(() => {
@@ -81,22 +82,32 @@ const AppNavigator = () => {
     config: {
       screens: {
         Calculator: {
-          path: 'calc',
+          path: '/',
+          parse: {
+            calc: (calc) => ({ calc }),
+          },
         },
         Research: {
-          path: 'collection',
+          path: '/',
+          parse: {
+            collection: (collection) => ({ collection }),
+          },
         },
       },
     },
     async getInitialURL() {
       const { getInitialURL } = require('expo-linking');
       const url = await getInitialURL();
-      if (url) handleDeepLink(url);
+      if (url) {
+        console.log('Initial URL:', url);
+        handleDeepLink(url);
+      }
       return url;
     },
     subscribe(listener) {
       const { addEventListener } = require('expo-linking');
       const onReceiveURL = ({ url }) => {
+        console.log('Received URL:', url);
         handleDeepLink(url);
         listener(url);
       };
@@ -111,7 +122,21 @@ const AppNavigator = () => {
     try {
       const { parse } = require('expo-linking');
       const parsed = parse(url);
-      const { calc, collection } = parsed.queryParams || {};
+
+      // Fallback manual parsing if queryParams is empty (happens on some mobile redirects)
+      let calc = parsed.queryParams?.calc;
+      let collection = parsed.queryParams?.collection;
+
+      if (!calc && !collection && url.includes('?')) {
+        const queryPart = url.split('?')[1];
+        const params = queryPart.split('&').reduce((acc, param) => {
+          const [key, value] = param.split('=');
+          acc[key] = decodeURIComponent(value);
+          return acc;
+        }, {});
+        calc = params.calc;
+        collection = params.collection;
+      }
 
       if (calc) {
         const { decodeCalculation } = require('../utils/shareUtils');
@@ -130,13 +155,55 @@ const AppNavigator = () => {
           // Note: To set the input text, CalculatorScreen should listen for route params
         }
       } else if (collection) {
+        console.log('Processing collection parameter in mobile app...');
         const { decodeSharedCollection, importSharedCollection } = require('../utils/researchStorage');
         const entries = decodeSharedCollection(collection);
+        console.log('Decoded entries:', entries);
+        
         if (entries && entries.length > 0) {
           const { Alert } = require('react-native');
           const count = await importSharedCollection(entries);
+          console.log('Import count:', count);
+          
           if (count > 0) {
-            Alert.alert('Import Successful', `Imported ${count} research entries.`);
+            Alert.alert(
+              'Import Successful', 
+              `Successfully imported ${count} research entries!`,
+              [
+                {
+                  text: 'View Research',
+                  onPress: () => {
+                    // Navigate to Research tab
+                    // We need to store this navigation request and handle it after NavigationContainer is ready
+                    setTimeout(() => {
+                      if (navigationRef.current) {
+                        navigationRef.current.navigate('Research');
+                      }
+                    }, 100);
+                  }
+                },
+                { text: 'OK', style: 'cancel' }
+              ]
+            );
+          } else {
+            console.log('No new entries imported (all may be duplicates)');
+            Alert.alert(
+              'Collection Processed', 
+              'No new entries were imported. All entries may already exist in your research list.',
+              [
+                {
+                  text: 'View Research',
+                  onPress: () => {
+                    setTimeout(() => {
+                      if (navigationRef.current) {
+                        navigationRef.current.navigate('Research');
+                      }
+                    }, 100);
+                  }
+                },
+                { text: 'OK', style: 'cancel' }
+              ]
+            );
           }
         }
       }
@@ -150,7 +217,7 @@ const AppNavigator = () => {
   }
 
   return (
-    <NavigationContainer linking={linking}>
+    <NavigationContainer linking={linking} ref={navigationRef}>
       <Tab.Navigator
         tabBar={props => <TabBar {...props} />}
         screenOptions={{

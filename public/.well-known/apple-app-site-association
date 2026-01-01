@@ -3,7 +3,7 @@
     "apps": [],
     "details": [
       {
-        "appID": "YOUR_TEAM_ID.com.gematriacalculator.app",
+        "appID": "YOUR_TEAM_ID.com.gematriacalculator.gematriacalculator",
         "paths": [
           "*"
         ]
@@ -12,7 +12,7 @@
   },
   "webcredentials": {
     "apps": [
-      "YOUR_TEAM_ID.com.gematriacalculator.app"
+      "YOUR_TEAM_ID.com.gematriacalculator.gematriacalculator"
     ]
   }
 }

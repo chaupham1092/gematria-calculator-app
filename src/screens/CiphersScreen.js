@@ -122,36 +122,40 @@ const CiphersScreen = ({ selectedCiphers, setSelectedCiphers }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Select Ciphers</Text>
+        <View style={styles.container}>
+          <Text style={styles.title}>Select Ciphers</Text>
 
-        <View style={styles.searchContainer}>
-          <View style={styles.searchInputContainer}>
-            <Ionicons name="search" size={20} color={colors.lightText} style={styles.searchIcon} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search ciphers..."
-              value={searchTerm}
-              onChangeText={setSearchTerm}
-              clearButtonMode="while-editing"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
+          <View style={styles.searchContainer}>
+            <View style={styles.searchInputContainer}>
+              <Ionicons name="search" size={20} color={colors.lightText} style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search ciphers..."
+                value={searchTerm}
+                onChangeText={setSearchTerm}
+                clearButtonMode="while-editing"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
           </View>
+
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity style={styles.button} onPress={selectAll}>
+              <Text style={styles.buttonText}>Select All</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[styles.button, styles.clearButton]} onPress={clearAll}>
+              <Text style={styles.buttonText}>Clear All</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+            <View style={styles.ciphersContainer}>
+              {Object.keys(cipherCategories).map(category => renderCategory(category))}
+            </View>
+          </ScrollView>
         </View>
-
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={styles.button} onPress={selectAll}>
-            <Text style={styles.buttonText}>Select All</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[styles.button, styles.clearButton]} onPress={clearAll}>
-            <Text style={styles.buttonText}>Clear All</Text>
-          </TouchableOpacity>
-        </View>
-
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-          {Object.keys(cipherCategories).map(category => renderCategory(category))}
-        </ScrollView>
       </View>
     </SafeAreaView>
   );

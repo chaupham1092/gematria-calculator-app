@@ -159,26 +159,65 @@ export const importResearchCollection = async (jsonData) => {
   }
 };
 
+// Custom Base64 encoder for environments where btoa is not available
+const base64Encode = (str) => {
+  try {
+    if (typeof btoa === 'function') return btoa(str);
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+    let output = '';
+    for (let block, charCode, idx = 0, map = chars; str.charAt(idx | 0) || (map = '=', idx % 1); output += map.charAt(63 & block >> 8 - idx % 1 * 8)) {
+      charCode = str.charCodeAt(idx += 3 / 4);
+      if (charCode > 0xFF) throw new Error("'btoa' failed");
+      block = block << 8 | charCode;
+    }
+    return output;
+  } catch (e) {
+    console.error('Base64 encode error:', e);
+    return null;
+  }
+};
+
 /**
  * Share entire research collection
  */
 export const shareResearchCollection = (entries) => {
-  // Encode multiple entries
+  // Encode multiple entries using abbreviated keys to save space
   const data = {
-    type: 'collection',
-    entries: entries.map(entry => ({
-      text: entry.text,
-      ciphers: Object.keys(entry.selectedCiphers).filter(key => entry.selectedCiphers[key]),
-      note: entry.note,
-      tags: entry.tags
+    y: 'c', // type: collection
+    e: entries.map(entry => ({
+      t: entry.text, // text
+      c: Object.keys(entry.selectedCiphers).filter(key => entry.selectedCiphers[key]), // ciphers
+      n: entry.note, // note
+      g: entry.tags // tags
     }))
   };
 
   const jsonString = JSON.stringify(data);
-  const base64 = btoa(unescape(encodeURIComponent(jsonString)));
-  const urlSafe = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  const encoded = base64Encode(unescape(encodeURIComponent(jsonString)));
+  if (!encoded) return '';
+  const urlSafe = encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 
   return urlSafe;
+};
+
+// Custom Base64 decoder for environments where atob is not available (like React Native)
+const base64Decode = (str) => {
+  try {
+    if (typeof atob === 'function') return atob(str);
+
+    // Simple polyfill for atob
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+    let output = '';
+    str = String(str).replace(/=+$/, '');
+    if (str.length % 4 === 1) throw new Error('Invalid base64');
+    for (let bc = 0, bs, buffer, idx = 0; buffer = str.charAt(idx++); ~buffer && (bs = bc % 4 ? bs * 64 + buffer : buffer, bc++ % 4) ? output += String.fromCharCode(255 & bs >> (-2 * bc & 6)) : 0) {
+      buffer = chars.indexOf(buffer);
+    }
+    return output;
+  } catch (e) {
+    console.error('Base64 decode error:', e);
+    return null;
+  }
 };
 
 /**
@@ -186,16 +225,30 @@ export const shareResearchCollection = (entries) => {
  */
 export const decodeSharedCollection = (encoded) => {
   try {
+    if (!encoded) return null;
     let base64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
     while (base64.length % 4) {
       base64 += '=';
     }
 
-    const jsonString = decodeURIComponent(escape(atob(base64)));
+    const decoded = base64Decode(base64);
+    if (!decoded) return null;
+
+    const jsonString = decodeURIComponent(escape(decoded));
     const data = JSON.parse(jsonString);
 
+    // Support both old (verbose) and new (abbreviated) formats
     if (data.type === 'collection' && Array.isArray(data.entries)) {
       return data.entries;
+    }
+
+    if (data.y === 'c' && Array.isArray(data.e)) {
+      return data.e.map(item => ({
+        text: item.t,
+        ciphers: item.c,
+        note: item.n,
+        tags: item.g
+      }));
     }
 
     return null;

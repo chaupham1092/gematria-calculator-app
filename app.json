@@ -2,7 +2,7 @@
   "expo": {
     "name": "GematriaCal",
     "slug": "gematria-calculator-app",
-    "version": "1.0.4",
+    "version": "1.1.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -16,18 +16,38 @@
     ],
     "ios": {
       "supportsTablet": true,
+      "buildNumber": "1.1.4",
       "bundleIdentifier": "com.gematriacalculator.gematriacalculator",
+      "associatedDomains": [
+        "applinks:gematriacalculator.xyz"
+      ],
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "versionCode": 7,
+      "versionCode": 8,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.gematriacalculator.gematriacalculator"
+      "package": "com.gematriacalculator.gematriacalculator",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "gematriacalculator.xyz"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "bundler": "webpack",
@@ -38,8 +58,8 @@
       [
         "react-native-google-mobile-ads",
         {
-          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
-          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
+          "androidAppId": "ca-app-pub-5199693306490546~2469173598",
+          "iosAppId": "ca-app-pub-5199693306490546~2469173598"
         }
       ],
       [

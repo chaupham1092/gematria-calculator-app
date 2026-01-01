@@ -72,6 +72,10 @@ const CalculatorScreen = ({ selectedCiphers, route }) => {
     calculateResults(inputText, selectedCiphers);
   }, [inputText, selectedCiphers, calculateResults]);
 
+  useEffect(() => {
+    calculateResults(inputText, selectedCiphers);
+  }, [inputText, selectedCiphers, calculateResults]);
+
   useFocusEffect(
     useCallback(() => {
       if (results.length > 0) {
@@ -123,81 +127,85 @@ const CalculatorScreen = ({ selectedCiphers, route }) => {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <SafeAreaView style={styles.safeArea}>
-          <View style={styles.container}>
-            <Text style={styles.title}>Gematria Calculator</Text>
+          <ScrollView
+            style={styles.mainScrollView}
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            alwaysBounceVertical={true}
+          >
+            <View style={styles.container}>
+              <Text style={styles.title}>Gematria Calculator</Text>
 
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter text to calculate..."
-                value={inputText}
-                onChangeText={setInputText}
-                multiline
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-
-            {/* Save to Research Button */}
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={handleSaveToResearch}
-            >
-              <Text style={styles.saveButtonText}>💾 Save to Research List</Text>
-            </TouchableOpacity>
-
-            {/* Number Filter */}
-            <View style={styles.filterContainer}>
-              <Text style={styles.filterLabel}>Filter by Number (optional):</Text>
-              <TextInput
-                style={styles.filterInput}
-                placeholder="e.g., 33"
-                value={targetNumber}
-                onChangeText={setTargetNumber}
-                keyboardType="numeric"
-              />
-            </View>
-
-            {filteredResults.length > 0 ? (
-              <View style={styles.resultsContainer}>
-                <Text style={styles.resultsTitle}>Results</Text>
-
-                <ScrollView
-                  style={styles.resultsList}
-                  keyboardShouldPersistTaps="handled"
-                >
-                  {filteredResults.map((result) => (
-                    <ResultItem
-                      key={result.key}
-                      result={result}
-                      expanded={expandedResults[result.key]}
-                      onToggleExpand={() => toggleResultExpand(result.key)}
-                    />
-                  ))}
-                </ScrollView>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter text to calculate..."
+                  value={inputText}
+                  onChangeText={setInputText}
+                  multiline
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
               </View>
-            ) : results.length > 0 && targetNumber.trim() ? (
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyIcon}>🔍</Text>
-                <Text style={styles.emptyText}>
-                  No ciphers match the number {targetNumber}
-                </Text>
-                <Text style={styles.emptySubtext}>
-                  Try a different number or clear the filter
-                </Text>
+
+              {/* Save to Research Button */}
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={handleSaveToResearch}
+              >
+                <Text style={styles.saveButtonText}>💾 Save to Research List</Text>
+              </TouchableOpacity>
+
+              {/* Number Filter */}
+              <View style={styles.filterContainer}>
+                <Text style={styles.filterLabel}>Filter by Number (optional):</Text>
+                <TextInput
+                  style={styles.filterInput}
+                  placeholder="e.g., 33"
+                  value={targetNumber}
+                  onChangeText={setTargetNumber}
+                  keyboardType="numeric"
+                />
               </View>
-            ) : (
-              <View style={styles.emptyContainer}>
-                {inputText.trim() ? (
+
+              {filteredResults.length > 0 ? (
+                <View style={styles.resultsContainer}>
+                  <Text style={styles.resultsTitle}>Results</Text>
+
+                  <View style={styles.resultsList}>
+                    {filteredResults.map((result) => (
+                      <ResultItem
+                        key={result.key}
+                        result={result}
+                        expanded={expandedResults[result.key]}
+                        onToggleExpand={() => toggleResultExpand(result.key)}
+                      />
+                    ))}
+                  </View>
+                </View>
+              ) : results.length > 0 && targetNumber.trim() ? (
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.emptyIcon}>🔍</Text>
                   <Text style={styles.emptyText}>
-                    No ciphers selected. Please select at least one cipher.
+                    No ciphers match the number {targetNumber}
                   </Text>
-                ) : (
-                  <Text style={styles.emptyText}>Enter text to see results</Text>
-                )}
-              </View>
-            )}
-          </View>
+                  <Text style={styles.emptySubtext}>
+                    Try a different number or clear the filter
+                  </Text>
+                </View>
+              ) : (
+                <View style={styles.emptyContainer}>
+                  {inputText.trim() ? (
+                    <Text style={styles.emptyText}>
+                      No ciphers selected. Please select at least one cipher.
+                    </Text>
+                  ) : (
+                    <Text style={styles.emptyText}>Enter text to see results</Text>
+                  )}
+                </View>
+              )}
+            </View>
+          </ScrollView>
         </SafeAreaView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
@@ -208,6 +216,12 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  mainScrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   container: {
     flex: 1,
