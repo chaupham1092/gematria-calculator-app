@@ -8,7 +8,7 @@ export const encodeCalculation = (text, selectedCiphers) => {
     text: text,
     ciphers: Object.keys(selectedCiphers).filter(key => selectedCiphers[key])
   };
-  
+
   const jsonString = JSON.stringify(data);
   const base64 = btoa(unescape(encodeURIComponent(jsonString)));
   // Make URL-safe
@@ -26,7 +26,7 @@ export const decodeCalculation = (encoded) => {
     while (base64.length % 4) {
       base64 += '=';
     }
-    
+
     const jsonString = decodeURIComponent(escape(atob(base64)));
     return JSON.parse(jsonString);
   } catch (error) {
@@ -60,7 +60,8 @@ export const generateDeepLink = (text, selectedCiphers) => {
 export const shortenUrl = async (longUrl) => {
   try {
     // Try Netlify function first (avoids rate limiting)
-    const response = await fetch('/.netlify/functions/shorten-url', {
+    const domain = 'https://gematriacalculator.xyz';
+    const response = await fetch(`${domain}/.netlify/functions/shorten-url`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -74,15 +75,15 @@ export const shortenUrl = async (longUrl) => {
         return data.shortUrl;
       }
     }
-    
+
     // Fallback to direct is.gd API call
     const fallbackResponse = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`);
     const fallbackData = await fallbackResponse.json();
-    
+
     if (fallbackData.shorturl) {
       return fallbackData.shorturl;
     }
-    
+
     return longUrl;
   } catch (error) {
     console.error('Error shortening URL:', error);

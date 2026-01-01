@@ -72,14 +72,26 @@ export default function WebCalculator() {
     }
   }, [allCiphers]);
 
+  const importProcessed = React.useRef(false);
+
   // Handle incoming shared calculations
   const handleSharedCalculation = async () => {
+    if (importProcessed.current) return;
+
     try {
       const urlParams = new URLSearchParams(window.location.search);
       const calcParam = urlParams.get('calc');
       const collectionParam = urlParams.get('collection');
 
       console.log('Checking URL params:', { calcParam, collectionParam });
+
+      // If no valid params, don't mark as processed so that if they appear later we handle them?
+      // Actually, if they aren't there on load, they won't appear later without a navigation event.
+      if (!calcParam && !collectionParam) {
+        return;
+      }
+
+      importProcessed.current = true;
 
       if (calcParam) {
         const decoded = decodeCalculation(calcParam);
@@ -103,49 +115,8 @@ export default function WebCalculator() {
         console.log('Decoded entries:', entries);
 
         if (entries && entries.length > 0) {
-          // Import all entries into localStorage
-          const { importResearchCollection } = require('../utils/researchStorage');
-
-          // Convert the light shared format back to full research entries format before importing
-          // or modify importResearchCollection to handle this.
-          // Since importResearchCollection expects full entries, let's adapt the shared entries to full entries manually here first.
-          const fullEntries = entries.map(entry => {
-            const cipherSelection = {};
-            // Construct cipher selection object from array of keys
-            if (entry.ciphers && Array.isArray(entry.ciphers)) {
-              entry.ciphers.forEach(cipherKey => {
-                cipherSelection[cipherKey] = true;
-              });
-            }
-
-            // Calculate results on the fly
-            const results = calculateGematria(entry.text, cipherSelection);
-
-            return {
-              id: Date.now().toString() + Math.random().toString(36).substr(2, 9), // Unique ID
-              text: entry.text,
-              timestamp: Date.now(),
-              note: entry.note || '',
-              selectedCiphers: cipherSelection,
-              results: results,
-              tags: entry.tags || []
-            };
-          });
-
-          // We use a custom merging logic here to ensure we save them all correctly
-          // We can't use importResearchCollection directly because it expects potentially different structure or overrides
-          // Let's use saveToResearch sequentially to ensure they are added one by one safely
-          const { saveToResearch } = require('../utils/researchStorage');
-
-          let importCount = 0;
-          for (const entry of fullEntries) {
-            try {
-              await saveToResearch(entry.text, entry.selectedCiphers, entry.results, entry.note, entry.tags);
-              importCount++;
-            } catch (e) {
-              console.error("Error importing entry:", entry.text, e);
-            }
-          }
+          const { importSharedCollection } = require('../utils/researchStorage');
+          const importCount = await importSharedCollection(entries);
 
           if (importCount > 0) {
             alert(`Successfully imported ${importCount} research entries!`);
@@ -155,11 +126,16 @@ export default function WebCalculator() {
 
             // Clear URL parameters to prevent re-import on refresh
             window.history.replaceState({}, document.title, window.location.pathname);
+          } else {
+            console.log('No new entries imported (all may be duplicates)');
+            setCurrentPage('research');
+            window.history.replaceState({}, document.title, window.location.pathname);
           }
         }
       }
     } catch (error) {
       console.error('Error loading shared calculation:', error);
+      importProcessed.current = false; // Reset if error so user can retry? No, probably better to leave safely locked.
     }
   };
 

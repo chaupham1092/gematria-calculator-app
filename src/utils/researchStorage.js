@@ -49,12 +49,12 @@ const storage = {
  */
 export const saveToResearch = async (text, selectedCiphers, results, note = '', tags = []) => {
   const research = await getResearchCollection();
-  
+
   // Check if we've hit the limit
   if (research.length >= MAX_ENTRIES) {
     throw new Error(`Research list is full! Maximum ${MAX_ENTRIES} entries allowed. Please delete some entries before adding more.`);
   }
-  
+
   const entry = {
     id: Date.now().toString(),
     text: text.trim(),
@@ -64,9 +64,9 @@ export const saveToResearch = async (text, selectedCiphers, results, note = '', 
     results: results,
     tags: tags,
   };
-  
+
   research.unshift(entry); // Add to beginning
-  
+
   try {
     await storage.setItem(STORAGE_KEY, JSON.stringify(research));
   } catch (error) {
@@ -76,7 +76,7 @@ export const saveToResearch = async (text, selectedCiphers, results, note = '', 
     }
     throw error;
   }
-  
+
   return entry;
 };
 
@@ -109,13 +109,13 @@ export const deleteResearchEntry = async (id) => {
 export const updateResearchEntry = async (id, updates) => {
   const research = await getResearchCollection();
   const index = research.findIndex(entry => entry.id === id);
-  
+
   if (index !== -1) {
     research[index] = { ...research[index], ...updates };
     await storage.setItem(STORAGE_KEY, JSON.stringify(research));
     return research[index];
   }
-  
+
   return null;
 };
 
@@ -125,7 +125,7 @@ export const updateResearchEntry = async (id, updates) => {
 export const exportResearchCollection = async () => {
   const research = await getResearchCollection();
   const dataStr = JSON.stringify(research, null, 2);
-  
+
   if (Platform.OS === 'web') {
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
@@ -173,11 +173,11 @@ export const shareResearchCollection = (entries) => {
       tags: entry.tags
     }))
   };
-  
+
   const jsonString = JSON.stringify(data);
   const base64 = btoa(unescape(encodeURIComponent(jsonString)));
   const urlSafe = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-  
+
   return urlSafe;
 };
 
@@ -190,14 +190,14 @@ export const decodeSharedCollection = (encoded) => {
     while (base64.length % 4) {
       base64 += '=';
     }
-    
+
     const jsonString = decodeURIComponent(escape(atob(base64)));
     const data = JSON.parse(jsonString);
-    
+
     if (data.type === 'collection' && Array.isArray(data.entries)) {
       return data.entries;
     }
-    
+
     return null;
   } catch (error) {
     console.error('Error decoding collection:', error);
@@ -206,11 +206,64 @@ export const decodeSharedCollection = (encoded) => {
 };
 
 /**
+ * Import a shared collection into local storage efficiently
+ */
+export const importSharedCollection = async (entries) => {
+  if (!entries || !Array.isArray(entries)) return 0;
+
+  const research = await getResearchCollection();
+  const existingMap = new Map();
+
+  // Create a map for deduplication: text + sorted ciphers
+  research.forEach(entry => {
+    const cipherKey = Object.keys(entry.selectedCiphers).filter(k => entry.selectedCiphers[k]).sort().join('|');
+    existingMap.set(`${entry.text}::${cipherKey}`, true);
+  });
+
+  const { calculateGematria } = require('./calculator');
+  let importCount = 0;
+  const newEntries = [];
+
+  for (const item of entries) {
+    const cipherSelection = {};
+    if (item.ciphers && Array.isArray(item.ciphers)) {
+      item.ciphers.forEach(k => cipherSelection[k] = true);
+    }
+
+    const cipherKey = Object.keys(cipherSelection).sort().join('|');
+    const dedupKey = `${item.text}::${cipherKey}`;
+
+    if (!existingMap.has(dedupKey)) {
+      const results = calculateGematria(item.text, cipherSelection);
+      const entry = {
+        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+        text: item.text.trim(),
+        timestamp: Date.now(),
+        note: (item.note || '').trim(),
+        selectedCiphers: cipherSelection,
+        results: results,
+        tags: item.tags || [],
+      };
+      newEntries.push(entry);
+      existingMap.set(dedupKey, true);
+      importCount++;
+    }
+  }
+
+  if (newEntries.length > 0) {
+    const updatedResearch = [...newEntries, ...research].slice(0, MAX_ENTRIES);
+    await storage.setItem(STORAGE_KEY, JSON.stringify(updatedResearch));
+  }
+
+  return importCount;
+};
+
+/**
  * Get summary statistics for research collection
  */
 export const getResearchStats = async () => {
   const research = await getResearchCollection();
-  
+
   return {
     totalEntries: research.length,
     maxEntries: MAX_ENTRIES,

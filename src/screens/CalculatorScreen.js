@@ -25,12 +25,18 @@ const CalculatorScreen = ({ selectedCiphers, route }) => {
   const [expandedResults, setExpandedResults] = useState({});
   const [targetNumber, setTargetNumber] = useState('');
 
-  // Handle loaded text from Research screen
+  // Handle loaded text from Research screen or deep links
   useEffect(() => {
     if (route?.params?.loadedText) {
       setInputText(route.params.loadedText);
+    } else if (route?.params?.calc) {
+      const { decodeCalculation } = require('../utils/shareUtils');
+      const decoded = decodeCalculation(route.params.calc);
+      if (decoded && decoded.text) {
+        setInputText(decoded.text);
+      }
     }
-  }, [route?.params?.loadedText]);
+  }, [route?.params?.loadedText, route?.params?.calc]);
 
   const debounce = (func, delay) => {
     let timeoutId;
@@ -90,12 +96,12 @@ const CalculatorScreen = ({ selectedCiphers, route }) => {
       Alert.alert('No Text', 'Please enter some text to save');
       return;
     }
-    
+
     if (results.length === 0) {
       Alert.alert('No Results', 'Please wait for calculations to complete');
       return;
     }
-    
+
     try {
       await saveToResearch(inputText, selectedCiphers, results, '', []);
       Alert.alert('Saved!', 'Added to Research List');
@@ -105,7 +111,7 @@ const CalculatorScreen = ({ selectedCiphers, route }) => {
   };
 
   // Filter results by target number
-  const filteredResults = targetNumber.trim() 
+  const filteredResults = targetNumber.trim()
     ? results.filter(result => result.totalValue.toString() === targetNumber.trim())
     : results;
 
@@ -133,8 +139,8 @@ const CalculatorScreen = ({ selectedCiphers, route }) => {
             </View>
 
             {/* Save to Research Button */}
-            <TouchableOpacity 
-              style={styles.saveButton} 
+            <TouchableOpacity
+              style={styles.saveButton}
               onPress={handleSaveToResearch}
             >
               <Text style={styles.saveButtonText}>💾 Save to Research List</Text>
