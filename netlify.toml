@@ -1,5 +1,5 @@
 [build]
-  command = "npx expo export:web"
+  command = "npx expo export:web && cp public/app-ads.txt web-build/app-ads.txt && cp -r public/.well-known web-build/"
   publish = "web-build"
 
 [functions]
@@ -14,6 +14,7 @@
   [headers.values]
     Content-Type = "text/plain"
     Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=3600"
 
 # Serve apple-app-site-association without .json extension
 [[headers]]
