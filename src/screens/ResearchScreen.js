@@ -106,44 +106,56 @@ const ResearchScreen = ({ navigation, selectedCiphers, setSelectedCiphers }) => 
 
     const encoded = shareResearchCollection(research);
     const baseUrl = 'https://gematriacalculator.xyz';
-    const url = `${baseUrl}?collection=${encoded}`;
+    const longUrl = `${baseUrl}?collection=${encoded}`;
 
     try {
-      // Use Clipboard as primary share feedback for mobile
-      // Shortening happen in background
-      const shortenedUrl = await shortenUrl(url);
-
-      if (shortenedUrl !== url) {
-        await Clipboard.setStringAsync(shortenedUrl);
-        Alert.alert('Link Shortened & Copied', `The shortened link is ready to share:\n\n${shortenedUrl}`, [
+      console.log('Attempting to shorten URL:', longUrl);
+      
+      // Shorten the URL using the same logic as web version
+      const shortUrl = await shortenUrl(longUrl);
+      
+      console.log('Shortened URL result:', shortUrl);
+      
+      // Copy to clipboard
+      await Clipboard.setStringAsync(shortUrl);
+      
+      // Show success with the shortened URL
+      Alert.alert(
+        'Short Link Ready!', 
+        `Your shortened link has been copied to clipboard:\n\n${shortUrl}\n\nShare this link to share your entire research collection.`,
+        [
           {
             text: 'Share Now',
             onPress: () => RNShare.share({
-              message: `Check out my Gematria research collection: ${shortenedUrl}`,
-              url: shortenedUrl,
+              message: `Check out my Gematria research collection: ${shortUrl}`,
+              url: shortUrl,
               title: 'Share Research Collection',
             })
           },
           { text: 'OK', style: 'cancel' }
-        ]);
-      } else {
-        // Shortening failed or returned same URL
-        await Clipboard.setStringAsync(url);
-        Alert.alert('Link Copied', 'The research collection link has been copied to your clipboard.', [
-          {
-            text: 'Share Now',
-            onPress: () => RNShare.share({
-              message: `Check out my Gematria research collection: ${url}`,
-              url: url,
-              title: 'Share Research Collection',
-            })
-          },
-          { text: 'OK', style: 'cancel' }
-        ]);
-      }
+        ]
+      );
+      
     } catch (error) {
-      await Clipboard.setStringAsync(url);
-      Alert.alert('Link Copied', 'The link was copied to clipboard.');
+      console.error('Error shortening URL:', error);
+      
+      // Fallback to long URL
+      await Clipboard.setStringAsync(longUrl);
+      Alert.alert(
+        'Link Ready', 
+        'The research collection link has been copied to your clipboard.',
+        [
+          {
+            text: 'Share Now',
+            onPress: () => RNShare.share({
+              message: `Check out my Gematria research collection: ${longUrl}`,
+              url: longUrl,
+              title: 'Share Research Collection',
+            })
+          },
+          { text: 'OK', style: 'cancel' }
+        ]
+      );
     }
   };
 

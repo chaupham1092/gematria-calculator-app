@@ -8,6 +8,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,
+  TouchableOpacity,
+  TextInput,
+  Alert,
   Keyboard,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +20,61 @@ import PrivacyPolicyModal from '../components/PrivacyPolicyModal';
 
 const AboutScreen = () => {
   const [privacyModalVisible, setPrivacyModalVisible] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    // Validate form
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      Alert.alert('Missing Information', 'Please fill in all fields');
+      return;
+    }
+
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      Alert.alert('Invalid Email', 'Please enter a valid email address');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Create form data for Netlify (same as web version)
+      const formBody = new URLSearchParams({
+        'form-name': 'contact',
+        ...formData
+      }).toString();
+
+      // Submit to Netlify Forms (same endpoint as web)
+      const response = await fetch('https://gematriacalculator.xyz/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formBody
+      });
+
+      if (response.ok) {
+        Alert.alert(
+          'Message Sent!', 
+          'Thank you for your message! We\'ll get back to you soon.',
+          [{ text: 'OK', onPress: () => {
+            setFormData({ name: '', email: '', subject: '', message: '' });
+          }}]
+        );
+      } else {
+        Alert.alert('Error', 'Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An error occurred. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -101,6 +159,76 @@ const AboutScreen = () => {
                 <Text style={styles.cipherName}>Special Ciphers:</Text>
                 <Text style={styles.cipherDescription}>Include Septenary, Chaldean, and Keypad systems.</Text>
               </View>
+            </View>
+
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Ionicons
+                  name="mail-outline"
+                  size={24}
+                  color={colors.primary}
+                  style={styles.sectionIcon}
+                />
+                <Text style={styles.sectionTitle}>Contact Us</Text>
+              </View>
+              <Text style={styles.text}>
+                Have questions, suggestions, or feedback? We'd love to hear from you!
+              </Text>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Your Name</Text>
+                <TextInput
+                  style={styles.input}
+                  value={formData.name}
+                  onChangeText={(text) => setFormData({ ...formData, name: text })}
+                  placeholder="Enter your name"
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Email Address</Text>
+                <TextInput
+                  style={styles.input}
+                  value={formData.email}
+                  onChangeText={(text) => setFormData({ ...formData, email: text })}
+                  placeholder="Enter your email"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Subject</Text>
+                <TextInput
+                  style={styles.input}
+                  value={formData.subject}
+                  onChangeText={(text) => setFormData({ ...formData, subject: text })}
+                  placeholder="Enter subject"
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Your Message</Text>
+                <TextInput
+                  style={[styles.input, styles.textarea]}
+                  value={formData.message}
+                  onChangeText={(text) => setFormData({ ...formData, message: text })}
+                  placeholder="Enter your message"
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                />
+              </View>
+
+              <TouchableOpacity
+                style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
+                onPress={handleSubmit}
+                disabled={isSubmitting}
+              >
+                <Text style={styles.submitButtonText}>
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
+                </Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.section}>
@@ -208,6 +336,43 @@ const styles = StyleSheet.create({
   cipherDescription: {
     fontSize: typography.fontSize.medium,
     color: colors.lightText,
+  },
+  formGroup: {
+    marginBottom: spacing.md,
+  },
+  label: {
+    fontSize: typography.fontSize.medium,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: spacing.xs,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: layout.borderRadius.small,
+    padding: spacing.md,
+    fontSize: typography.fontSize.medium,
+    backgroundColor: colors.white,
+    color: colors.text,
+  },
+  textarea: {
+    minHeight: 100,
+    textAlignVertical: 'top',
+  },
+  submitButton: {
+    backgroundColor: colors.primary,
+    padding: spacing.md,
+    borderRadius: layout.borderRadius.small,
+    alignItems: 'center',
+    marginTop: spacing.sm,
+  },
+  submitButtonDisabled: {
+    backgroundColor: colors.lightText,
+  },
+  submitButtonText: {
+    color: colors.white,
+    fontSize: typography.fontSize.medium,
+    fontWeight: '600',
   },
 });
 

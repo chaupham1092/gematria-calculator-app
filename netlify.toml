@@ -8,6 +8,13 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# Serve app-ads.txt with correct headers
+[[headers]]
+  for = "/app-ads.txt"
+  [headers.values]
+    Content-Type = "text/plain"
+    Access-Control-Allow-Origin = "*"
+
 # Serve apple-app-site-association without .json extension
 [[headers]]
   for = "/.well-known/apple-app-site-association"
