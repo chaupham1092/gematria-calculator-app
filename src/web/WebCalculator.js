@@ -7,6 +7,7 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import DownloadPage from './pages/DownloadPage';
 import PrivacyPage from './pages/PrivacyPage';
+import DateCalculatorPage from './pages/DateCalculatorPage';
 import ResearchCollection from './components/ResearchCollection';
 import { saveToResearch } from '../utils/researchStorage';
 
@@ -271,6 +272,8 @@ export default function WebCalculator() {
         return <AboutPage />;
       case 'contact':
         return <ContactPage />;
+      case 'dates':
+        return <DateCalculatorPage />;
       case 'download':
         return <DownloadPage />;
       case 'privacy':
@@ -528,6 +531,13 @@ export default function WebCalculator() {
                 setShowSummary(false);
               }}>
                 <Text style={[styles.navLink, currentPage === 'about' && styles.navLinkActive]}>About</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => {
+                setCurrentPage('dates');
+                setShowCipherFilters(false);
+                setShowSummary(false);
+              }}>
+                <Text style={[styles.navLink, currentPage === 'dates' && styles.navLinkActive]}>Dates</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => {
                 setCurrentPage('contact');

@@ -58,8 +58,13 @@ const AdBanner = ({
     console.error(`Ad failed to load for placement: ${placement}`, error);
   };
 
-  // Don't render on web platform or if tracking status not determined yet
-  if (Platform.OS === 'web' || trackingStatus === null) {
+  // Don't render on web platform
+  if (Platform.OS === 'web') {
+    return null;
+  }
+
+  // Don't render if tracking status not determined yet
+  if (trackingStatus === null) {
     return null;
   }
 

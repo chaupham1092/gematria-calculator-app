@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import CalculatorScreen from '../screens/CalculatorScreen';
 import CiphersScreen from '../screens/CiphersScreen';
 import ResearchScreen from '../screens/ResearchScreen';
+import DateCalculatorScreen from '../screens/DateCalculatorScreen';
 import AboutScreen from '../screens/AboutScreen';
 import TabBar from '../components/TabBar';
 import { getInitialCipherSelections } from '../utils/calculator';
@@ -245,6 +246,7 @@ const AppNavigator = () => {
             />
           )}
         </Tab.Screen>
+        <Tab.Screen name="Dates" component={DateCalculatorScreen} />
         <Tab.Screen name="About" component={AboutScreen} />
       </Tab.Navigator>
     </NavigationContainer>

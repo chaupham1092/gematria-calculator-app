@@ -2,7 +2,7 @@
   "expo": {
     "name": "GematriaCal",
     "slug": "gematria-calculator-app",
-    "version": "1.1.4",
+    "version": "2.1.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -16,7 +16,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "1.1.4",
+      "buildNumber": "2.1.4",
       "bundleIdentifier": "com.gematriacalculator.gematriacalculator",
       "associatedDomains": [
         "applinks:gematriacalculator.xyz"
