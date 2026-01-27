@@ -12,6 +12,13 @@ module.exports = async function (env, argv) {
         argv
     );
 
+    // Exclude mobile-only packages from web build
+    config.resolve.alias = {
+        ...config.resolve.alias,
+        'react-native-google-mobile-ads': false,
+        '@react-native-google-mobile-ads/admob': false,
+    };
+
     // Customize the config before returning it
     return config;
 };

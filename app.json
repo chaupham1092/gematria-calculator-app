@@ -56,11 +56,26 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "./plugins/withMetaAds",
+      "./plugins/withAppLovinAds",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
       [
         "react-native-google-mobile-ads",
         {
           "androidAppId": "ca-app-pub-5199693306490546~2469173598",
-          "iosAppId": "ca-app-pub-5199693306490546~2469173598"
+          "iosAppId": "ca-app-pub-5199693306490546~2469173598",
+          "skAdNetworkItems": [
+            "v9wttpbfk9.skadnetwork",
+            "n38lu8286q.skadnetwork",
+            "ludvb6z3bs.skadnetwork"
+          ]
         }
       ],
       [

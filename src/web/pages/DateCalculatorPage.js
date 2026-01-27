@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import { Helmet } from 'react-helmet-async';
 import { calculateDateNumerology, getDayOfYear, getDaysLeftInYear, calculateDuration } from '../../utils/dateNumerology';
 
 export default function DateCalculatorPage() {
@@ -93,7 +94,31 @@ export default function DateCalculatorPage() {
   // Mobile Layout - matches the mobile app exactly
   if (isMobile) {
     return (
-      <ScrollView style={styles.mobileContainer} contentContainerStyle={styles.mobileScrollContent}>
+      <>
+        <Helmet>
+          <title>Date Calculator - Numerology & Duration Calculator | Gematria Calculator</title>
+          <meta name="description" content="Calculate date numerology, life path numbers, and duration between dates. Free online date calculator with numerological insights." />
+          <meta name="keywords" content="date calculator, numerology calculator, life path number, date duration, date numerology" />
+          
+          {/* Open Graph / Facebook */}
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content="https://gematriacalculator.xyz/dates" />
+          <meta property="og:title" content="Date Calculator - Numerology & Duration Calculator" />
+          <meta property="og:description" content="Calculate date numerology, life path numbers, and duration between dates. Free online date calculator with numerological insights." />
+          <meta property="og:image" content="https://gematriacalculator.xyz/images/gematria-og-image.jpg" />
+          
+          {/* Twitter */}
+          <meta property="twitter:card" content="summary_large_image" />
+          <meta property="twitter:url" content="https://gematriacalculator.xyz/dates" />
+          <meta property="twitter:title" content="Date Calculator - Numerology & Duration Calculator" />
+          <meta property="twitter:description" content="Calculate date numerology, life path numbers, and duration between dates." />
+          <meta property="twitter:image" content="https://gematriacalculator.xyz/images/gematria-og-image.jpg" />
+          
+          {/* Canonical URL */}
+          <link rel="canonical" href="https://gematriacalculator.xyz/dates" />
+        </Helmet>
+
+        <ScrollView style={styles.mobileContainer} contentContainerStyle={styles.mobileScrollContent}>
         <Text style={styles.mobileTitle}>Date Calculator</Text>
         
         <View style={styles.mobileDateCard}>
@@ -184,12 +209,37 @@ export default function DateCalculatorPage() {
           </>
         )}
       </ScrollView>
+      </>
     );
   }
 
   // Desktop Layout
   return (
-    <ScrollView style={styles.container}>
+    <>
+      <Helmet>
+        <title>Date Calculator - Numerology & Duration Calculator | Gematria Calculator</title>
+        <meta name="description" content="Calculate date numerology, life path numbers, and duration between dates. Free online date calculator with numerological insights." />
+        <meta name="keywords" content="date calculator, numerology calculator, life path number, date duration, date numerology" />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://gematriacalculator.xyz/dates" />
+        <meta property="og:title" content="Date Calculator - Numerology & Duration Calculator" />
+        <meta property="og:description" content="Calculate date numerology, life path numbers, and duration between dates. Free online date calculator with numerological insights." />
+        <meta property="og:image" content="https://gematriacalculator.xyz/images/gematria-og-image.jpg" />
+        
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://gematriacalculator.xyz/dates" />
+        <meta property="twitter:title" content="Date Calculator - Numerology & Duration Calculator" />
+        <meta property="twitter:description" content="Calculate date numerology, life path numbers, and duration between dates." />
+        <meta property="twitter:image" content="https://gematriacalculator.xyz/images/gematria-og-image.jpg" />
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href="https://gematriacalculator.xyz/dates" />
+      </Helmet>
+
+      <ScrollView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.pageTitle}>Date Calculator</Text>
@@ -346,6 +396,7 @@ export default function DateCalculatorPage() {
         )}
       </View>
     </ScrollView>
+    </>
   );
 }
 

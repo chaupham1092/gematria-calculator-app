@@ -2,11 +2,11 @@
 inclusion: manual
 ---
 
-# AdMob Development Workflow
+# AdMob, Meta & AppLovin Development Workflow
 
-## CRITICAL: AdMob Incompatibility with Expo Go
+## CRITICAL: AdMob, Meta & AppLovin Incompatibility with Expo Go
 
-**AdMob is NOT compatible with Expo Go.** This creates a specific workflow for development and testing.
+**AdMob, Meta Audience Network, and AppLovin are NOT compatible with Expo Go.** This creates a specific workflow for development and testing.
 
 ## Development Workflow
 
@@ -28,12 +28,12 @@ When ready to deploy to TestFlight or App Store:
    - `src/components/AdBanner.js` - Enable banner ads
    
 2. **Build with EAS Build** (not Expo Go)
-3. **Ads will work** in TestFlight and App Store
+3. **Ads will work** in TestFlight and App Store (AdMob + Meta + AppLovin mediation)
 
 ## Trade-off
 
 - **Expo Go enabled** = No ads, but fast development
-- **AdMob enabled** = Ads work, but can't use Expo Go (must use EAS Build)
+- **AdMob/Meta/AppLovin enabled** = Ads work, but can't use Expo Go (must use EAS Build)
 
 ## AdMob Configuration
 
@@ -41,6 +41,36 @@ When ready to deploy to TestFlight or App Store:
 **Test Ad Unit ID:** `ca-app-pub-3940256099942544/6300978111`
 
 **Ad Placement:** Single sticky banner above bottom tab bar (in `TabBar.js`)
+
+## Mediation Partners
+
+### Meta Audience Network
+Meta Audience Network is configured as a mediation partner through AdMob dashboard. The native adapters are added via custom Expo plugin.
+
+**Plugin:** `plugins/withMetaAds.js`
+- iOS: Adds `GoogleMobileAdsMediationMeta` pod
+- Android: Adds Meta SDK and mediation adapter gradle dependencies
+
+**Configuration in app.json:**
+- Custom plugin: `./plugins/withMetaAds`
+- Meta SKAdNetwork identifiers in `react-native-google-mobile-ads` plugin
+
+### AppLovin
+AppLovin is configured as a mediation partner through AdMob dashboard. The native adapters are added via custom Expo plugin.
+
+**Plugin:** `plugins/withAppLovinAds.js`
+- iOS: Adds `GoogleMobileAdsMediationAppLovin` pod
+- Android: Adds AppLovin SDK and mediation adapter gradle dependencies
+
+**Configuration in app.json:**
+- Custom plugin: `./plugins/withAppLovinAds`
+- AppLovin SKAdNetwork identifier in `react-native-google-mobile-ads` plugin
+
+**How Mediation Works:**
+- AdMob handles mediation automatically
+- No code changes needed in app
+- Meta/AppLovin ads show when AdMob can't fill
+- Same comment/uncomment workflow as AdMob
 
 ## App Tracking Transparency (ATT) - Why Our App Works
 
@@ -95,15 +125,15 @@ useEffect(() => {
 - ❌ Not handling errors in try-catch blocks
 
 ### Why Fresh Build is Required
-After adding `expo-tracking-transparency`, you MUST run `eas build` because ATT requires native code changes that can't be delivered via OTA updates.
+After adding `expo-tracking-transparency`, Meta mediation, or AppLovin mediation, you MUST run `eas build` because they require native code changes that can't be delivered via OTA updates.
 
 ## Quick Toggle Commands
 
-**To disable AdMob for Expo Go:**
+**To disable AdMob/Meta/AppLovin for Expo Go:**
 - Comment out imports and code in `App.js` and `src/components/AdBanner.js`
 - AdBanner returns `null`
 
-**To enable AdMob for production:**
+**To enable AdMob/Meta/AppLovin for production:**
 - Uncomment all AdMob code
 - Build with EAS Build
 - Deploy to TestFlight/App Store

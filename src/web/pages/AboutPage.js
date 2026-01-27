@@ -1,12 +1,37 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import { Helmet } from 'react-helmet-async';
 
 export default function AboutPage() {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
   return (
-    <ScrollView style={[styles.container, isMobile && styles.containerMobile]}>
+    <>
+      <Helmet>
+        <title>About Gematria - History, Ciphers & Modern Applications | Gematria Calculator</title>
+        <meta name="description" content="Learn about gematria, its historical origins in Hebrew mysticism and Kabbalah, major cipher systems, and modern applications. Explore the ancient art of numerology." />
+        <meta name="keywords" content="about gematria, hebrew mysticism, kabbalah, gematria history, cipher systems, numerology, isopsephy" />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://gematriacalculator.xyz/about" />
+        <meta property="og:title" content="About Gematria - History, Ciphers & Modern Applications" />
+        <meta property="og:description" content="Learn about gematria, its historical origins in Hebrew mysticism and Kabbalah, major cipher systems, and modern applications." />
+        <meta property="og:image" content="https://gematriacalculator.xyz/images/gematria-og-image.jpg" />
+        
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://gematriacalculator.xyz/about" />
+        <meta property="twitter:title" content="About Gematria - History, Ciphers & Modern Applications" />
+        <meta property="twitter:description" content="Learn about gematria, its historical origins in Hebrew mysticism and Kabbalah, major cipher systems, and modern applications." />
+        <meta property="twitter:image" content="https://gematriacalculator.xyz/images/gematria-og-image.jpg" />
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href="https://gematriacalculator.xyz/about" />
+      </Helmet>
+
+      <ScrollView style={[styles.container, isMobile && styles.containerMobile]}>
       <Text style={styles.title}>About Gematria</Text>
 
       <View style={styles.content}>
@@ -53,6 +78,7 @@ export default function AboutPage() {
         </Text>
       </View>
     </ScrollView>
+    </>
   );
 }
 
