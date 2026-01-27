@@ -684,12 +684,12 @@ nav a:hover, nav a.active, .main-nav a:hover, .main-nav a.active {
 
 /* Page Layout Styles for Blog and Other Pages */
 .page-container {
-    width: 100%;
-    margin: 0;
+    max-width: 900px;
+    margin: 20px auto;
     padding: 20px;
     background-color: white;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Download Page - Centered Layout */
@@ -712,8 +712,8 @@ nav a:hover, nav a.active, .main-nav a:hover, .main-nav a.active {
 }
 
 .page-content {
-    width: 100%;
-    margin: 0;
+    max-width: 800px;
+    margin: 0 auto;
     line-height: 1.8;
 }
 
