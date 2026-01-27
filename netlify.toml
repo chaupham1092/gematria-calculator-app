@@ -1,5 +1,5 @@
 [build]
-  command = "npx expo export:web && cp public/app-ads.txt web-build/app-ads.txt && cp -r public/.well-known web-build/"
+  command = "npx expo export:web && cp public/app-ads.txt web-build/app-ads.txt && cp -r public/.well-known web-build/ && cp -r public/pages web-build/"
   publish = "web-build"
 
 [functions]
@@ -29,6 +29,13 @@
   to = "/app-ads.txt"
   status = 200
 
+# Serve static blog posts and pages (don't redirect to SPA)
+[[redirects]]
+  from = "/pages/*"
+  to = "/pages/:splat"
+  status = 200
+
+# SPA fallback - must be last
 [[redirects]]
   from = "/*"
   to = "/index.html"
