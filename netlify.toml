@@ -1,5 +1,5 @@
 [build]
-  command = "npx expo export:web && cp public/app-ads.txt web-build/app-ads.txt && cp -r public/.well-known web-build/ && cp -r public/pages web-build/ && cp public/styles.css web-build/ && cp -r public/images web-build/"
+  command = "npx expo export:web && cp public/app-ads.txt web-build/app-ads.txt && cp -r public/.well-known web-build/ && cp -r public/pages web-build/ && cp public/styles.css web-build/ && cp -r public/images web-build/ && cp public/sitemap.xml web-build/ && cp public/robots.txt web-build/"
   publish = "web-build"
 
 [functions]

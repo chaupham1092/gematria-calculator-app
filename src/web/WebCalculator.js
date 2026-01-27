@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity, StyleSheet, Linking, useWindowDimensions } from 'react-native';
+import { Helmet } from 'react-helmet-async';
 import { calculateGematria, getAvailableCiphers, getCipherCategories } from '../utils/calculator';
 import { decodeCalculation } from '../utils/shareUtils';
 import { decodeSharedCollection } from '../utils/researchStorage';
@@ -506,7 +507,29 @@ export default function WebCalculator() {
   };
 
   return (
-    <View style={styles.container}>
+    <>
+      <Helmet>
+        <title>Gematria Calculator - Calculate Hebrew & English Numerology Values</title>
+        <meta name="description" content="Free online gematria calculator supporting 50+ cipher systems. Calculate Hebrew, English, and Greek numerology values instantly. Explore Kabbalah and sacred numerology." />
+        <meta name="keywords" content="gematria calculator, hebrew numerology, english gematria, kabbalah calculator, numerology, cipher calculator, hebrew letters" />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://gematriacalculator.xyz/" />
+        <meta property="og:title" content="Gematria Calculator - Calculate Hebrew & English Numerology Values" />
+        <meta property="og:description" content="Free online gematria calculator supporting 50+ cipher systems. Calculate Hebrew, English, and Greek numerology values instantly." />
+        
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://gematriacalculator.xyz/" />
+        <meta property="twitter:title" content="Gematria Calculator - Calculate Hebrew & English Numerology Values" />
+        <meta property="twitter:description" content="Free online gematria calculator supporting 50+ cipher systems. Calculate Hebrew, English, and Greek numerology values instantly." />
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href="https://gematriacalculator.xyz/" />
+      </Helmet>
+
+      <View style={styles.container}>
       {/* Entire page is now scrollable, including Header and Footer */}
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         {/* Header with Navigation - Moved inside ScrollView */}
@@ -584,6 +607,7 @@ export default function WebCalculator() {
         </View>
       </ScrollView>
     </View>
+    </>
   );
 }
 
